@@ -54,7 +54,7 @@ public class Updater extends Thread {
         updateOthers();
     }
 
-    private synchronized void updateConfigs() {
+    public synchronized void updateConfigs() {
         debug("setting counter: 0");
         counter = 0;
 
@@ -67,7 +67,7 @@ public class Updater extends Thread {
         updater.forEach(up -> up.getGuildAllConfigs().forEach(ConfigObject::load));
     }
 
-    private synchronized void updateOthers() {
+    public synchronized void updateOthers() {
         debug("doing other updates");
     }
 

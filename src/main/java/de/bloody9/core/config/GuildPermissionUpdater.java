@@ -1,7 +1,6 @@
 package de.bloody9.core.config;
 
 import de.bloody9.core.Bot;
-import de.bloody9.core.logging.Logger;
 import de.bloody9.core.models.objects.ConfigObject;
 import de.bloody9.core.models.interfaces.ConfigUpdater;
 

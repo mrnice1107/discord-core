@@ -37,7 +37,6 @@ public class Bot {
 
     public static BotInitObject enterArgs(String[] args) {
         String sqlUser = null, sqlPw = null, dcToken = null, prefix = null;
-        LogLevel logLevel = null;
 
         for (int i = 0; i < args.length - 1; i++) {
             String arg = args[i].toLowerCase();
@@ -110,7 +109,7 @@ public class Bot {
     private final CommandManager commandManager;
     private final String commandPrefix;
 
-    private final Updater updater;
+    private Updater updater;
 
     public Bot(String[] args) {
         this(enterArgs(args));
@@ -153,13 +152,6 @@ public class Bot {
         }
         debug("jda was build successfully");
 
-        debug("adding config updater");
-        List<ConfigUpdater> configUpdater = new ArrayList<>();
-        addConfigUpdater(configUpdater);
-
-        debug("initialize updater");
-        updater = new Updater(configUpdater);
-
         afterInit(initObject);
 
         running = true;
@@ -171,31 +163,30 @@ public class Bot {
         startConsoleCommandReader();
     }
 
-    private void preInit(BotInitObject initObject) {
+    public void preInit(BotInitObject initObject) {
         debug("pre initializing");
         initializeSQL(initObject);
     }
 
-    private void init(BotInitObject initObject, JDABuilder builder) {
+    public void init(BotInitObject initObject, JDABuilder builder) {
         debug("initializing");
         setInitialJDAStatus(builder);
         setInitialJDASettings(builder);
         addEventListener(builder, initObject.getCommandPrefix());
     }
 
-    private void afterInit(BotInitObject initObject) {
+    public void afterInit(BotInitObject initObject) {
         debug("after initializing");
         
-        debug("starting updater");
-        updater.start();
+        startUpdater();
     }
-    
-    private void addConfigUpdater(List<ConfigUpdater> updater) {
+
+    public void addConfigUpdater(List<ConfigUpdater> updater) {
         debug("adding config updater");
         updater.add(new GuildPermissionUpdater());
     }
 
-    private void addBotCommands(HashMap<String, BotCommand> commands) {
+    public void addBotCommands(HashMap<String, BotCommand> commands) {
         debug("adding bot commands");
 
         // commands must be lower case
@@ -203,37 +194,49 @@ public class Bot {
         commands.put("permission", new PermissionCommand());
     }
 
-    private void initializeSQL(BotInitObject initObject) {
+    public void initializeSQL(BotInitObject initObject) {
         debug("initialize sql");
         MySQLConnection.init(initObject.getSqlUser(), initObject.getSqlPassword());
     }
 
-    private void setInitialJDAStatus(JDABuilder builder) {
+    public void setInitialJDAStatus(JDABuilder builder) {
         debug("set activity and status");
         builder.setStatus(OnlineStatus.ONLINE);
     }
 
-    private void setInitialJDASettings(JDABuilder builder) {
+    public void setInitialJDASettings(JDABuilder builder) {
         debug("set jda settings");
         builder.setChunkingFilter(ChunkingFilter.NONE);
         builder.enableIntents(GatewayIntent.GUILD_MEMBERS);
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
     }
 
-    private void addEventListener(JDABuilder builder, String prefix) {
+    public void addEventListener(JDABuilder builder, String prefix) {
         debug("add event listeners");
         builder.addEventListeners(new CommandListener(prefix));
     }
 
-    private void startConsoleCommandReader() {
+    public void addConsoleCommands(HashMap<String, SimpleCommand> consoleCommands) {
+        consoleCommands.put("loglevel", new CMDLogLevel());
+        consoleCommands.put("update", new CMDUpdate());
+    }
+
+    public void startConsoleCommandReader() {
         HashMap<String, SimpleCommand> commands = new HashMap<>();
         addConsoleCommands(commands);
         new ConsoleCommandReader(commands).start();
     }
 
-    private void addConsoleCommands(HashMap<String, SimpleCommand> consoleCommands) {
-        consoleCommands.put("loglevel", new CMDLogLevel());
-        consoleCommands.put("update", new CMDUpdate());
+    public void startUpdater() {
+        debug("adding config updater");
+        List<ConfigUpdater> configUpdater = new ArrayList<>();
+        addConfigUpdater(configUpdater);
+
+        debug("initialize updater");
+        updater = new Updater(configUpdater);
+
+        debug("starting updater");
+        updater.start();
     }
 
     public List<GuildPermission> getGuildPermissions() {
