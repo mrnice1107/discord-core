@@ -1,7 +1,7 @@
 # discord-core
 
 Version:
-1.0.0 - SNAPSHOT
+1.0-FINAL
 
 Features:
 - permission system + command
