@@ -51,6 +51,7 @@ public class Updater extends Thread {
     public synchronized void update() {
         info("Updating");
         updateConfigs();
+        updateOthers();
     }
 
     private synchronized void updateConfigs() {

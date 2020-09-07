@@ -30,31 +30,35 @@ public class BotInitObject {
         return SqlUser;
     }
 
-    public void setSqlUser(String sqlUser) {
+    public BotInitObject setSqlUser(String sqlUser) {
         SqlUser = sqlUser;
+        return this;
     }
 
     public String getSqlPassword() {
         return SqlPassword;
     }
 
-    public void setSqlPassword(String sqlPassword) {
+    public BotInitObject setSqlPassword(String sqlPassword) {
         SqlPassword = sqlPassword;
+        return this;
     }
 
     public String getDiscordToken() {
         return DiscordToken;
     }
 
-    public void setDiscordToken(String discordToken) {
+    public BotInitObject setDiscordToken(String discordToken) {
         DiscordToken = discordToken;
+        return this;
     }
 
     public String getCommandPrefix() {
         return commandPrefix;
     }
 
-    public void setCommandPrefix(String commandPrefix) {
+    public BotInitObject setCommandPrefix(String commandPrefix) {
         this.commandPrefix = commandPrefix;
+        return this;
     }
 }

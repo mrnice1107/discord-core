@@ -14,15 +14,17 @@ public class PermissionObject {
         return permission;
     }
 
-    public void setPermission(String permission) {
+    public PermissionObject setPermission(String permission) {
         this.permission = permission;
+        return this;
     }
 
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public PermissionObject setDescription(String description) {
         this.description = description;
+        return this;
     }
 }
