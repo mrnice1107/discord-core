@@ -30,9 +30,9 @@ public class Logger {
      * */
 
     public static void init() {
-        debug("initialize logfile");
+        debugInLogger("initialize logfile");
         try {
-            String fileName = "log/logging_" + Helper.getTime("yyyy_MM_dd_HH_mm_ss") + ".log";
+            String fileName = "log/log_" + Helper.getTime("yyyy_MM_dd_HH_mm_ss") + ".logs";
 
             File logfile = new File(fileName);
             Helper.createFile(logfile);
@@ -49,7 +49,7 @@ public class Logger {
     public static void close() {
         if (initialized) {
             try {
-                debug("close writer");
+                debugInLogger("close writer");
                 writer.close();
                 writer = null;
                 initialized = false;
@@ -60,7 +60,7 @@ public class Logger {
     }
 
     public static void reInit() {
-        debug("reinitialize logfile");
+        debugInLogger("reinitialize logfile");
         close();
         init();
     }
@@ -78,12 +78,7 @@ public class Logger {
         }
     }
 
-    private static String constructMessage(CharSequence message, String level, int lowerTrace) {
-        return constructMessage(message, level, lowerTrace, true);
-    }
-    private static String constructMessage(CharSequence message, String level, int lowerTrace, boolean doReset) {
-        String path = getTracePath(lowerTrace);
-
+    private static String buildMessage(String level, String path, CharSequence message, boolean doReset) {
         String time = Helper.getTime();
 
         StringBuilder logBuilder;
@@ -95,6 +90,20 @@ public class Logger {
         logBuilder.append("-> ").append(message); // Message
 
         return logBuilder.toString();
+    }
+
+    private static String constructMessage(CharSequence message, String level, int lowerTrace) {
+        return constructMessage(message, level, lowerTrace, true);
+    }
+    private static String constructMessage(CharSequence message, String level, int lowerTrace, boolean doReset) {
+        String path = getTracePath(lowerTrace);
+
+        return buildMessage(level, path, message, doReset);
+    }
+    private static String constructMessageInLogger(CharSequence message, String level, boolean doReset) {
+        String path = getTracePathLastInLogger();
+
+        return buildMessage(level, path, message, doReset);
     }
 
     private static String getTracePath(int lowerTrace) {
@@ -109,6 +118,23 @@ public class Logger {
                 return stackTrace[i].toString();
             }
         }
+        return stackTrace[stackTrace.length - 1].toString();
+    }
+    private static String getTracePathLastInLogger() {
+        StackTraceElement[] stackTrace = (new Throwable()).getStackTrace();
+
+        for (int i = 0; i < stackTrace.length; i++) {
+            StackTraceElement stackTraceElement = stackTrace[i];
+            if (stackTraceElement.getMethodName().equalsIgnoreCase("constructMessageInLogger")) {
+                i++;
+                stackTraceElement = stackTrace[i];
+                if (stackTraceElement.getMethodName().equalsIgnoreCase("writeInLogger")) {
+                    i++;
+                }
+                return stackTrace[i+1].toString();
+            }
+        }
+
         return stackTrace[stackTrace.length - 1].toString();
     }
 
@@ -140,26 +166,31 @@ public class Logger {
         }
     }
 
+    private static void logInLogger(CharSequence message) { logLine(constructMessageInLogger(message, prefixLog, false)); }
     public static void log(CharSequence message, int lowerTrace) { logLine(constructMessage(message, prefixLog, lowerTrace, false)); }
     public static void log(CharSequence message) { log(message, 0); }
     public static void log(Object obj, int lowerTrace) { log(String.valueOf(obj), lowerTrace); }
     public static void log(Object obj) { log(String.valueOf(obj), 0); }
 
+    private static void debugInLogger(CharSequence message) { writeInLogger(prefixDebug, message, LogLevel.DEBUG); }
     public static void debug(CharSequence message, int lowerTrace) { write(prefixDebug, message, lowerTrace, LogLevel.DEBUG); }
     public static void debug(CharSequence message) { debug(message, 0); }
     public static void debug(Object obj, int lowerTrace) { debug(String.valueOf(obj), lowerTrace); }
     public static void debug(Object obj) { debug(String.valueOf(obj), 0); }
 
+    private static void warnInLogger(CharSequence message) { writeInLogger(prefixWarn, message, LogLevel.WARN); }
     public static void warn(CharSequence message, int lowerTrace) { write(prefixWarn, message, lowerTrace, LogLevel.WARN); }
     public static void warn(CharSequence message) { warn(message, 0); }
     public static void warn(Object obj, int lowerTrace) { warn(String.valueOf(obj), lowerTrace); }
     public static void warn(Object obj) { warn(String.valueOf(obj), 0); }
 
+    private static void infoInLogger(CharSequence message) { writeInLogger(prefixInfo, message, LogLevel.INFO); }
     public static void info(CharSequence message, int lowerTrace) { write(prefixInfo, message, lowerTrace, LogLevel.INFO); }
     public static void info(CharSequence message) { info(message, 0); }
     public static void info(Object obj, int lowerTrace) { info(String.valueOf(obj), lowerTrace); }
     public static void info(Object obj) { info(String.valueOf(obj), 0); }
 
+    private static void errorInLogger(CharSequence message) { writeInLogger(prefixError, message, LogLevel.ERROR); }
     public static void error(CharSequence message, int lowerTrace) { write(prefixError, message, lowerTrace, LogLevel.ERROR); }
     public static void error(CharSequence message) { error(message, 0); }
     public static void error(Object obj, int lowerTrace) { error(String.valueOf(obj), lowerTrace); }
@@ -179,6 +210,16 @@ public class Logger {
         error(err.toString());
     }
 
+    private static void writeInLogger(String prefix, CharSequence message, LogLevel logLevel) {
+        if (getLogLevelValue(logLevel) < getLogLevelValue(getLogLevel())) {
+            return;
+        }
+        System.out.println(constructMessageInLogger(message, prefix, true));
+
+        if (!logLevel.equals(LogLevel.DEBUG)) {
+            logLine(constructMessageInLogger(message, "[" + logLevel.name() + "]", false));
+        }
+    }
     private static void write(String prefix, CharSequence message, int lowerTrace, LogLevel logLevel) {
         if (getLogLevelValue(logLevel) < getLogLevelValue(getLogLevel())) {
             return;
