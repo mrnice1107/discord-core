@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -111,9 +113,30 @@ public class Helper {
     }
 
 
+    public static void createFile(String path) throws IOException {
+        createFile(new File(path));
+    }
+
+    public static void createFile(File file) throws IOException {
+        if (file.getParentFile().mkdirs()) {
+            System.out.println("Directory created: " + file.getAbsolutePath());
+        } else {
+            System.out.println("Directory already exists.");
+        }
+        if (file.createNewFile()) {
+            System.out.println("File created: " + file.getName());
+        } else {
+            System.out.println("File already exists.");
+        }
+    }
+
     public static String getTime() {
+        return getTime("yyyy-MM-dd HH:mm:ss");
+    }
+
+    public static String getTime(String format) {
         Date date = new Date();
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+        return new SimpleDateFormat(format).format(date);
     }
 
 

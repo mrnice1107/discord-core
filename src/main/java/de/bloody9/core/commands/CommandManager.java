@@ -51,6 +51,7 @@ public class CommandManager {
 
         debug("delete initial command message on discord");
         message.delete().delay(1000L, TimeUnit.MILLISECONDS).queue();
+
         debug("result of command:" + result);
         return result;
     }

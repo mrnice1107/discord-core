@@ -21,9 +21,7 @@ public class GuildPermissionUpdater implements ConfigUpdater {
     }
 
     @Override
-    public List<ConfigObject> getGuildAllConfigs() {
-        List<?> guildPermissionList = instance.getGuildPermissions();
-
-        return (List<ConfigObject>)guildPermissionList;
+    public List<? extends ConfigObject> getGuildAllConfigs() {
+        return instance.getGuildPermissions();
     }
 }

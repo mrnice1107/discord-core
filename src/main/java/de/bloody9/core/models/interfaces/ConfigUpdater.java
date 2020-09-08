@@ -7,6 +7,6 @@ import java.util.List;
 public interface ConfigUpdater {
 
     ConfigObject getGuildConfigByGuildID(String guildId);
-    List<ConfigObject> getGuildAllConfigs();
+    List<? extends ConfigObject> getGuildAllConfigs();
 
 }

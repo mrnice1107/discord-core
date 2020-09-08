@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,11 +39,11 @@ public class MySQLConnection {
         return DriverManager.getConnection(url, user, password);
     }
 
-    public static boolean executeUpdate(List<String> commands) {
-        return executeUpdate(new HashSet<>(commands));
+    public static boolean executeUpdate(Set<String> commands) {
+        return executeUpdate(new ArrayList<>(commands));
     }
 
-    public static boolean executeUpdate(Set<String> commands) {
+    public static boolean executeUpdate(List<String> commands) {
         debug("executing sql updates: " + commands.toString());
         try {
             Connection con = getConnection();

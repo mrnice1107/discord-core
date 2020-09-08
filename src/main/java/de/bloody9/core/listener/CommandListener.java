@@ -52,8 +52,4 @@ public class CommandListener extends ListenerAdapter {
             }
         }
     }
-
-    public String getPrefix() {
-        return prefix;
-    }
 }

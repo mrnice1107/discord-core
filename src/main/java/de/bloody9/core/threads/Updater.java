@@ -59,9 +59,7 @@ public class Updater extends Thread {
         counter = 0;
 
         debug("foreach every loaded guild and init ConfigObjects");
-        instance.getJda().getGuilds().forEach(guild -> {
-            updater.forEach(up -> up.getGuildConfigByGuildID(guild.getId()));
-        });
+        instance.getJda().getGuilds().forEach(guild -> updater.forEach(up -> up.getGuildConfigByGuildID(guild.getId())));
 
         debug("Reloading all loaded ConfigObjects");
         updater.forEach(up -> up.getGuildAllConfigs().forEach(ConfigObject::load));

@@ -1,8 +1,6 @@
 package de.bloody9.core.threads;
 
 import de.bloody9.core.Bot;
-import de.bloody9.core.logging.LogLevel;
-import de.bloody9.core.logging.Logger;
 import de.bloody9.core.models.interfaces.SimpleCommand;
 import net.dv8tion.jda.api.JDA;
 
@@ -48,6 +46,7 @@ public class ConsoleCommandReader extends Thread {
                         info("-----------------");
                         info("Shutting down bot");
                         info("-----------------");
+
                         bot.setRunning(false);
                     }
                     reader.close();
@@ -64,7 +63,9 @@ public class ConsoleCommandReader extends Thread {
                             SimpleCommand cmd = commands.get(command);
 
                             args = Arrays.copyOfRange(args, 1, args.length);
-                            cmd.perform(command, args);
+                            if (!cmd.perform(command, args)) {
+                                info(help);
+                            }
                         } else {
                             info(help);
                         }

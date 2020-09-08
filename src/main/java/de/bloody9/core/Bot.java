@@ -115,6 +115,7 @@ public class Bot {
         this(enterArgs(args));
     }
 
+
     public Bot(BotInitObject initObject) {
         info("------------");
         info("Initializing");
@@ -161,6 +162,15 @@ public class Bot {
         info("-----------");
 
         startConsoleCommandReader();
+
+
+        try {
+            updater.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        debug("close logger");
+        close();
     }
 
     public void preInit(BotInitObject initObject) {
@@ -249,8 +259,6 @@ public class Bot {
     }
 
     public JDA getJda() { return jda; }
-
-    public void setJda(JDA jda) { this.jda = jda; }
 
     public boolean isRunning() { return running; }
 
