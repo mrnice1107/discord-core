@@ -4,7 +4,7 @@ package de.bloody9.core.threads;
 import static de.bloody9.core.logging.Logger.*;
 
 import de.bloody9.core.Bot;
-import de.bloody9.core.models.objects.ConfigObject;
+import de.bloody9.core.models.objects.UpdatableGuildObject;
 import de.bloody9.core.models.interfaces.ConfigUpdater;
 
 import java.util.List;
@@ -62,7 +62,7 @@ public class Updater extends Thread {
         instance.getJda().getGuilds().forEach(guild -> updater.forEach(up -> up.getGuildConfigByGuildID(guild.getId())));
 
         debug("Reloading all loaded ConfigObjects");
-        updater.forEach(up -> up.getGuildAllConfigs().forEach(ConfigObject::load));
+        updater.forEach(up -> up.getGuildAllConfigs().forEach(UpdatableGuildObject::update));
     }
 
     public synchronized void updateOthers() {

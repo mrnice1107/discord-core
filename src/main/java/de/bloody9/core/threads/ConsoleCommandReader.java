@@ -3,6 +3,7 @@ package de.bloody9.core.threads;
 import de.bloody9.core.Bot;
 import de.bloody9.core.models.interfaces.SimpleCommand;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.OnlineStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,6 +42,7 @@ public class ConsoleCommandReader extends Thread {
                     debug("shutting down bot!");
                     JDA jda = bot.getJda();
                     if (jda != null) {
+                        bot.setStatus(OnlineStatus.OFFLINE);
 
                         jda.shutdown();
                         info("-----------------");

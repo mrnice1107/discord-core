@@ -1,12 +1,12 @@
 package de.bloody9.core.models.interfaces;
 
-import de.bloody9.core.models.objects.ConfigObject;
+import de.bloody9.core.models.objects.UpdatableGuildObject;
 
 import java.util.List;
 
 public interface ConfigUpdater {
 
-    ConfigObject getGuildConfigByGuildID(String guildId);
-    List<? extends ConfigObject> getGuildAllConfigs();
+    UpdatableGuildObject getGuildConfigByGuildID(String guildId);
+    List<? extends UpdatableGuildObject> getGuildAllConfigs();
 
 }

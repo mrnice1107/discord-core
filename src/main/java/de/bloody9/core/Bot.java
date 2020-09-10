@@ -20,6 +20,7 @@ import de.bloody9.core.threads.Updater;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -163,11 +164,12 @@ public class Bot {
 
         startConsoleCommandReader();
 
-
-        try {
-            updater.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (updater != null) {
+            try {
+                updater.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         debug("close logger");
         close();
@@ -238,15 +240,29 @@ public class Bot {
     }
 
     public void startUpdater() {
+        initUpdater();
+
+        debug("starting updater");
+        updater.start();
+    }
+
+    public void initUpdater() {
         debug("adding config updater");
         List<ConfigUpdater> configUpdater = new ArrayList<>();
         addConfigUpdater(configUpdater);
 
         debug("initialize updater");
         updater = new Updater(configUpdater);
+    }
 
-        debug("starting updater");
-        updater.start();
+    public void setStatus(OnlineStatus status) {
+        debug("Set activity count to: " + status);
+        getJda().getPresence().setStatus(status);
+    }
+
+    public void setActivity(Activity activity) {
+        debug("Set activity count to: " + activity);
+        getJda().getPresence().setActivity(activity);
     }
 
     public List<GuildPermission> getGuildPermissions() {
@@ -269,4 +285,6 @@ public class Bot {
     public String getCommandPrefix() { return commandPrefix; }
 
     public Updater getUpdater() { return updater; }
+
+    public void setUpdater(Updater updater) { this.updater = updater; }
 }

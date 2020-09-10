@@ -19,6 +19,6 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\threads\ConsoleCom
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\interfaces\SimpleCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\logging\LogLevel.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\console\CMDLogLevel.java
-D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\ConfigObject.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\HelpCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\mysql\MySQLConnection.java
+D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\UpdatableGuildObject.java

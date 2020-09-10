@@ -2,7 +2,7 @@ package de.bloody9.core.config;
 
 import de.bloody9.core.Bot;
 import de.bloody9.core.helper.Helper;
-import de.bloody9.core.models.objects.ConfigObject;
+import de.bloody9.core.models.objects.UpdatableGuildObject;
 import de.bloody9.core.mysql.MySQLConnection;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.Role;
 
 import java.util.*;
 
-public class GuildPermission extends ConfigObject {
+public class GuildPermission extends UpdatableGuildObject {
 
     private Map<String, Set<String>> permissions;
 
@@ -31,26 +31,21 @@ public class GuildPermission extends ConfigObject {
 
     private GuildPermission(Guild guild) {
         super(guild);
-        load();
+        update();
     }
 
     @Override
-    public void load() {
+    public void update() {
         info("Loading GuildPermission");
-        boolean hasGuild = !Helper.getObjectFromDB("guild_id", "guilds", "guild_id=" + getGuildId()).isEmpty();
 
         permissions = new HashMap<>();
-        if (hasGuild) {
-            debug("Guild is already in config: loading permissions");
-            for (String permissionFromDB : Helper.getObjectFromDB("permission", "guild_permissions", "guild_id=" + getGuildId())) {
-                Set<String> members = new HashSet<>(Helper.getObjectFromDB("member_id", "guild_permissions", "permission='" + permissionFromDB + "'"));
-                debug("loading permission: " + permissionFromDB + ", for members: " + members.toString());
-                permissions.put(permissionFromDB, members);
-            }
-        } else {
-            Helper.executeInsertSQL("guilds", "guild_id", getGuildId());
-            info("Added new database because this one does not exists");
+
+        for (String permissionFromDB : Helper.getObjectFromDB("permission", "guild_permissions", "guild_id=" + getGuildId())) {
+            Set<String> members = new HashSet<>(Helper.getObjectFromDB("member_id", "guild_permissions", "permission='" + permissionFromDB + "'"));
+            debug("loading permission: " + permissionFromDB + ", for members: " + members.toString());
+            permissions.put(permissionFromDB, members);
         }
+
         info("Loaded GuildPermission");
     }
 

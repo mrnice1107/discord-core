@@ -1,7 +1,6 @@
 de\bloody9\core\models\objects\BotInitObject.class
 de\bloody9\core\listener\CommandListener.class
 de\bloody9\core\models\objects\PermissionObject.class
-de\bloody9\core\models\objects\ConfigObject.class
 de\bloody9\core\commands\bot\PermissionCommand.class
 de\bloody9\core\commands\console\CMDLogLevel.class
 de\bloody9\core\Bot.class
@@ -12,6 +11,7 @@ de\bloody9\core\helper\Helper.class
 de\bloody9\core\logging\LogLevel.class
 de\bloody9\core\commands\bot\HelpCommand.class
 de\bloody9\core\logging\Logger.class
+de\bloody9\core\models\objects\UpdatableGuildObject.class
 de\bloody9\core\Main.class
 de\bloody9\core\threads\Updater.class
 de\bloody9\core\config\GuildPermission.class
