@@ -17,8 +17,8 @@ public class Logger {
 
     private static final String prefixError = Colors.ANSI_RED + "[ERROR]";
     private static final String prefixInfo = Colors.ANSI_WHITE + "[INFO]";
-    private static final String prefixWarn = Colors.ANSI_CYAN + "[WARN]";
-    private static final String prefixDebug = Colors.ANSI_YELLOW + "[DEBUG]";
+    private static final String prefixWarn = Colors.ANSI_YELLOW + "[WARN]";
+    private static final String prefixDebug = Colors.ANSI_PURPLE + "[DEBUG]";
     private static final String prefixLog = "[LOG]";
 
     private static boolean initialized = false;
@@ -72,8 +72,9 @@ public class Logger {
         switch (logLevel) {
             case DEBUG: return 0;
             case INFO: return 1;
-            case ERROR: return 2;
-            case LOG: return 3;
+            case WARN: return 2;
+            case ERROR: return 3;
+            case LOG: return 4;
             default: return -1;
         }
     }
