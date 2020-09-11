@@ -43,19 +43,7 @@ public class Helper {
     }
 
     public static List<String> getObjectFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
-        debug("getting object from DB");
-        //example query "SELECT <column> FROM <table> WHERE <query>"
-        StringBuilder builder = new StringBuilder();
-
-        builder.append("SELECT ").append(column);
-        builder.append(" FROM ").append(table);
-
-        if (query != null && !query.equals(""))  {
-            builder.append(" WHERE ").append(query);
-        }
-
-        builder.append(";");
-        debug("query string: " + builder.toString());
+        String sqlQuery = constructQueryString(column, table, query);
 
         List<String> results = new ArrayList<>();
         try {
@@ -63,7 +51,7 @@ public class Helper {
             debug("building connection: " + con.toString());
             Statement stat = con.createStatement();
             debug("statement: " + stat.toString());
-            ResultSet resultSet = stat.executeQuery(builder.toString());
+            ResultSet resultSet = stat.executeQuery(sqlQuery);
             debug("query result: " + resultSet.toString());
 
             while (resultSet.next()) {
@@ -79,7 +67,73 @@ public class Helper {
 
         return results;
     }
+    public static List<Integer> getIntegerFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
+        String sqlQuery = constructQueryString(column, table, query);
 
+        List<Integer> results = new ArrayList<>();
+        try {
+            Connection con = MySQLConnection.getConnection();
+            debug("building connection: " + con.toString());
+            Statement stat = con.createStatement();
+            debug("statement: " + stat.toString());
+            ResultSet resultSet = stat.executeQuery(sqlQuery);
+            debug("query result: " + resultSet.toString());
+
+            while (resultSet.next()) {
+                results.add(resultSet.getInt(column));
+            }
+
+            resultSet.close();
+            stat.close();
+            con.close();
+        } catch (SQLException e) {
+            error(e);
+        }
+
+        return results;
+    }
+    public static List<Boolean> getBooleanFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
+        String sqlQuery = constructQueryString(column, table, query);
+
+        List<Boolean> results = new ArrayList<>();
+        try {
+            Connection con = MySQLConnection.getConnection();
+            debug("building connection: " + con.toString());
+            Statement stat = con.createStatement();
+            debug("statement: " + stat.toString());
+            ResultSet resultSet = stat.executeQuery(sqlQuery);
+            debug("query result: " + resultSet.toString());
+
+            while (resultSet.next()) {
+                results.add(resultSet.getBoolean(column));
+            }
+
+            resultSet.close();
+            stat.close();
+            con.close();
+        } catch (SQLException e) {
+            error(e);
+        }
+
+        return results;
+    }
+
+    private static String constructQueryString(@NotNull String column, @NotNull String table, @Nullable String query) {
+        debug("getting object from DB");
+        //example query "SELECT <column> FROM <table> WHERE <query>"
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("SELECT ").append(column);
+        builder.append(" FROM ").append(table);
+
+        if (query != null && !query.equals(""))  {
+            builder.append(" WHERE ").append(query);
+        }
+
+        builder.append(";");
+        debug("query string: " + builder.toString());
+        return builder.toString();
+    }
 
     public static boolean hasPermission(@NotNull String permission, Member member) {
         debug("has permission: " + permission);
@@ -151,7 +205,12 @@ public class Helper {
 
         return sql;
     }
+    public static String getInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String queryOnUpdate) {
+        String sql = getInsertSQL(table, contentType, content);
+        return sql.substring(0, sql.length()-1) + " ON DUPLICATE KEY UPDATE " + queryOnUpdate + ";";
+    }
 
+    // ON DUPLICATE KEY UPDATE
 
     public static boolean executeDeleteSQL(String table, String query) {
         return MySQLConnection.executeUpdate(getDeleteSQL(table, query));
