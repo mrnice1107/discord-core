@@ -10,6 +10,7 @@ import de.bloody9.core.config.GuildPermission;
 import de.bloody9.core.config.GuildPermissionUpdater;
 import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.interfaces.ConfigUpdater;
+import de.bloody9.core.models.objects.PermissionObject;
 import de.bloody9.core.mysql.MySQLConnection;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.listener.CommandListener;
@@ -106,6 +107,8 @@ public class Bot {
 
     private final List<GuildPermission> guildPermissions;
 
+    private final List<PermissionObject> permissions;
+
     private boolean running;
     private JDA jda;
     private final CommandManager commandManager;
@@ -125,14 +128,17 @@ public class Bot {
 
         preInit(initObject);
 
-        debug("initializing guild permission configs");
-        guildPermissions = new ArrayList<>();
-
         debug("setting instance");
         INSTANCE = this;
 
         debug("setting command prefix: " + initObject.getCommandPrefix());
         commandPrefix = initObject.getCommandPrefix();
+
+        debug("initializing guild permission configs");
+        guildPermissions = new ArrayList<>();
+
+        debug("initializing permission list");
+        permissions = new ArrayList<>();
 
         debug("initializing commands");
         HashMap<String, BotCommand> commands = new HashMap<>();
@@ -165,8 +171,6 @@ public class Bot {
 
         startConsoleCommandReader();
 
-
-
         if (updater != null) {
             try {
                 updater.join();
@@ -188,11 +192,12 @@ public class Bot {
         setInitialJDAStatus(builder);
         setInitialJDASettings(builder);
         addEventListener(builder, initObject.getCommandPrefix());
+        addPermissions();
     }
 
     public void afterInit(BotInitObject initObject) {
         debug("after initializing");
-        
+
         startUpdater();
     }
 
@@ -203,6 +208,10 @@ public class Bot {
     public void addConfigUpdater(List<ConfigUpdater> updater) {
         debug("adding config updater");
         updater.add(new GuildPermissionUpdater());
+    }
+
+    public void addPermissions() {
+        debug("adding permissions");
     }
 
     public void addBotCommands(HashMap<String, BotCommand> commands) {
@@ -261,6 +270,10 @@ public class Bot {
 
         debug("initialize updater");
         updater = new Updater(configUpdater);
+    }
+
+    public List<PermissionObject> getPermissions() {
+        return permissions;
     }
 
     public void setStatus(OnlineStatus status) {

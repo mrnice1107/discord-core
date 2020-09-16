@@ -178,10 +178,13 @@ public class GuildPermission extends UpdatableGuildObject {
         return false;
     }
 
-
     private boolean containsToCheck(String permission, String toCheck) {
         if (permissions.containsKey(permission)) {
             return permissions.get(permission).contains(toCheck);
         } else return false;
+    }
+
+    public Set<String> getMemberPermissions(String id) {
+        return permissions.get(id);
     }
 }

@@ -19,6 +19,11 @@ public class PermissionObject {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return permission + ": " + description;
+    }
+
     public String getDescription() {
         return description;
     }
