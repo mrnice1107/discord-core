@@ -146,6 +146,7 @@ public class PermissionCommand implements BotCommand {
                 guildPermission.addMember(permMembers, permission);
 
                 Helper.sendPrivateMessage(sender, "You successfully added the permission *" + permission + "* to: " + memberBuilder.toString());
+                guildPermission.modLog(sender.getAsMention() + ": added the permission *" + permission + "* to: " + memberBuilder.toString());
             }
         } else if (args[0].equalsIgnoreCase("remove")){
             debug("operation remove");
@@ -154,6 +155,7 @@ public class PermissionCommand implements BotCommand {
                 guildPermission.removeMember(permMembers, permission);
 
                 Helper.sendPrivateMessage(sender, "You successfully removed the permission *" + permission + "* from: " + memberBuilder.toString());
+                guildPermission.modLog(sender.getAsMention() + ": removed the permission *" + permission + "* from: " + memberBuilder.toString());
             }
         }
 

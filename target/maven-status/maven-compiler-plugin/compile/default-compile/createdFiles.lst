@@ -19,6 +19,7 @@ de\bloody9\core\commands\CommandManager.class
 de\bloody9\core\models\objects\GuildObject.class
 de\bloody9\core\logging\Logger$1.class
 de\bloody9\core\models\interfaces\SimpleCommand.class
+de\bloody9\core\commands\bot\LogCommand.class
 de\bloody9\core\threads\ConsoleCommandReader.class
 de\bloody9\core\models\interfaces\BotCommand.class
 de\bloody9\core\mysql\MySQLConnection.class

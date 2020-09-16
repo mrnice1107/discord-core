@@ -118,6 +118,12 @@ public class Helper {
         return results;
     }
 
+    public static String getFirstObjectFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
+        List<String> list = getObjectFromDB(column, table, query);
+        if (list.isEmpty()) return null;
+        return list.get(0);
+    }
+
     private static String constructQueryString(@NotNull String column, @NotNull String table, @Nullable String query) {
         debug("getting object from DB");
         //example query "SELECT <column> FROM <table> WHERE <query>"
@@ -195,25 +201,11 @@ public class Helper {
 
 
 
-    public static boolean executeInsertSQL(String table, String contentType, String content) {
-        return MySQLConnection.executeUpdate(getInsertSQL(table, contentType, content));
-    }
-
     public static String getInsertSQL(String table, String contentType, String content) {
         String sql = "INSERT INTO <table> (<contentType>) VALUES(<content>);";
         sql = sql.replace("<table>", table).replace("<contentType>", contentType).replace("<content>", content);
 
         return sql;
-    }
-    public static String getInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String queryOnUpdate) {
-        String sql = getInsertSQL(table, contentType, content);
-        return sql.substring(0, sql.length()-1) + " ON DUPLICATE KEY UPDATE " + queryOnUpdate + ";";
-    }
-
-    // ON DUPLICATE KEY UPDATE
-
-    public static boolean executeDeleteSQL(String table, String query) {
-        return MySQLConnection.executeUpdate(getDeleteSQL(table, query));
     }
 
     public static String getDeleteSQL(String table, String query) {
@@ -222,6 +214,22 @@ public class Helper {
 
         return sql;
     }
+
+    public static String getInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String queryOnUpdate) {
+        String sql = getInsertSQL(table, contentType, content);
+        return sql.substring(0, sql.length()-1) + " ON DUPLICATE KEY UPDATE " + queryOnUpdate + ";";
+    }
+
+
+    public static boolean executeInsertSQL(String table, String contentType, String content) {
+        return MySQLConnection.executeUpdate(getInsertSQL(table, contentType, content));
+    }
+
+    public static boolean executeDeleteSQL(String table, String query) { return MySQLConnection.executeUpdate(getDeleteSQL(table, query)); }
+
+    public static boolean executeInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String queryOnUpdate) { return MySQLConnection.executeUpdate(getInsertUpdateOnDuplicateSQL(table, contentType, content, queryOnUpdate)); }
+
+
 
     public static String getLineFromConsole(String out) {
         System.out.println(out);

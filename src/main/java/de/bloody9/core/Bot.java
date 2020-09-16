@@ -2,6 +2,7 @@ package de.bloody9.core;
 
 import de.bloody9.core.commands.*;
 import de.bloody9.core.commands.bot.HelpCommand;
+import de.bloody9.core.commands.bot.LogCommand;
 import de.bloody9.core.commands.bot.PermissionCommand;
 import de.bloody9.core.commands.console.CMDLogLevel;
 import de.bloody9.core.commands.console.CMDUpdate;
@@ -164,6 +165,8 @@ public class Bot {
 
         startConsoleCommandReader();
 
+
+
         if (updater != null) {
             try {
                 updater.join();
@@ -193,6 +196,10 @@ public class Bot {
         startUpdater();
     }
 
+    public void onShutdown() {
+        debug("shutting down bot");
+    }
+
     public void addConfigUpdater(List<ConfigUpdater> updater) {
         debug("adding config updater");
         updater.add(new GuildPermissionUpdater());
@@ -204,6 +211,7 @@ public class Bot {
         // commands must be lower case
         commands.put("help", new HelpCommand());
         commands.put("permission", new PermissionCommand());
+        commands.put("log", new LogCommand());
     }
 
     public void initializeSQL(BotInitObject initObject) {

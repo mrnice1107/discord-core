@@ -40,6 +40,9 @@ public class ConsoleCommandReader extends Thread {
                 String key = line.toLowerCase();
                 if (key.equals("exit")) {
                     debug("shutting down bot!");
+
+                    bot.onShutdown();
+
                     JDA jda = bot.getJda();
                     if (jda != null) {
                         bot.setStatus(OnlineStatus.OFFLINE);
