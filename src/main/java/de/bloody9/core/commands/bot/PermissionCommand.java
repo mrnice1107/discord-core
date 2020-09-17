@@ -220,7 +220,12 @@ public class PermissionCommand implements BotCommand {
     }
 
     private void addMemberPermissions(String id, StringBuilder builder, GuildPermission guildPermission) {
-        guildPermission.getMemberPermissions(id).forEach(s -> builder.append("\n- ").append(s.toLowerCase()));
+        Set<String> memberPermissions = guildPermission.getMemberPermissions(id);
+        if (memberPermissions != null) {
+            memberPermissions.forEach(s -> builder.append("\n- ").append(s.toLowerCase()));
+        } else {
+            builder.append("\n").append("- No permissions found");
+        }
     }
 
     private void sendHelp(User user) {
