@@ -51,7 +51,7 @@ public class GuildObject {
         if (modLogChannel != null) {
             modLogChannel.sendMessage(message).queue();
         }
-
+        info(message);
     }
 
     public void debug(CharSequence message) { Logger.debug(getGuildPrefix() + message, 1); }
