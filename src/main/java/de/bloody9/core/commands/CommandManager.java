@@ -39,7 +39,7 @@ public class CommandManager {
                     debug("performing done");
                 } catch (Exception ex) {
                     error(ex);
-                    Helper.sendPrivateMessage(sender, "An error occurred while executing ur command: " + ex.toString());
+                    Helper.sendPrivateMessage(sender, "An error occurred while executing your command: " + ex.toString());
                     result =  false;
                 }
             } else {

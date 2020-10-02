@@ -45,13 +45,29 @@ public class GuildObject {
 
     public void modLog(Object obj) { modLog(String.valueOf(obj)); }
     public void modLog(String message) {
+        info(message);
+
         if (modLogChannel == null) {
             loadModLogChannel();
         }
         if (modLogChannel != null) {
             modLogChannel.sendMessage(message).queue();
         }
+    }
+
+    public String modLogMessage(Object obj) { return modLogMessage(String.valueOf(obj)); }
+    public String modLogMessage(String message) {
         info(message);
+
+        if (modLogChannel == null) {
+            loadModLogChannel();
+        }
+
+        if (modLogChannel != null) {
+            String msgId;
+            return modLogChannel.sendMessage(message).complete().getId();
+        }
+        return null;
     }
 
     public void debug(CharSequence message) { Logger.debug(getGuildPrefix() + message, 1); }

@@ -1,7 +1,7 @@
 package de.bloody9.core.commands.bot;
 
 import de.bloody9.core.Bot;
-import de.bloody9.core.config.GuildPermission;
+import de.bloody9.core.permissions.GuildPermission;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.objects.PermissionObject;
@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.*;
 
 import java.util.*;
 
-import static de.bloody9.core.helper.Helper.hasPermission;
+import static de.bloody9.core.helper.PermissionHelper.memberHasPermission;
 import static de.bloody9.core.logging.Logger.debug;
 
 public class PermissionCommand implements BotCommand {
@@ -34,11 +34,12 @@ public class PermissionCommand implements BotCommand {
         permissionObjects.add(new PermissionObject(getPermission, "Get list of permissions"));
 
         description = "With this command you can manage the Permissions of the Bot\n" +
-                "Every command needs a permission to execute it, with this command you can give or take the them to or from users and roles";
+                "Every command needs a permission to execute it, with this command you can give or take the them to or from users and roles\n" +
+                "You can also get all available permissions or the permissions of a @member or @role";
 
         help = "Permission Command\n"
                 + prefix + " permission add/remove <permission> <@Role/@Member>\n"
-                + prefix + " permission get";
+                + prefix + " permission get [<@Role/@Member/permission>]";
     }
 
     @Override
@@ -66,7 +67,7 @@ public class PermissionCommand implements BotCommand {
         debug("message: " + message.getContentRaw());
         debug("args: " + Arrays.toString(args));
 
-        if (!hasPermission(generalPermission, message.getMember())) {
+        if (!memberHasPermission(generalPermission, message.getMember())) {
             return false;
         }
 
@@ -105,23 +106,19 @@ public class PermissionCommand implements BotCommand {
         Set<String> permMembers = new HashSet <>();
 
         guildPermission.debug("foreach all mentioned members and add them to members set");
-        StringBuilder memberBuilder = new StringBuilder();
+        StringJoiner memberJoiner = new StringJoiner(", ");
         for (Member mentionedMember : message.getMentionedMembers()) {
-            memberBuilder.append("@").append(mentionedMember.getUser().getAsTag()).append(", ");
+            memberJoiner.add("@" + mentionedMember.getUser().getAsTag());
             permMembers.add(mentionedMember.getId());
         }
 
         guildPermission.debug("foreach all mentioned roles and add them to members set");
         for (Role mentionedRole : message.getMentionedRoles()) {
             permMembers.add(mentionedRole.getId());
-            memberBuilder.append("@").append(mentionedRole.getName()).append(", ");
+            memberJoiner.add("@" + mentionedRole.getName());
         }
 
-        guildPermission.debug("memberBuilder (list of members): " + memberBuilder.toString());
-        if (memberBuilder.length() > 0) {
-            memberBuilder.setLength(memberBuilder.length() - 2);
-            guildPermission.debug("memberBuilder (list of members): " + memberBuilder.toString());
-        }
+        guildPermission.debug("memberBuilder (list of members): " + memberJoiner.toString());
 
         guildPermission.debug(permMembers.toString());
 
@@ -131,21 +128,21 @@ public class PermissionCommand implements BotCommand {
 
         if (args[0].equalsIgnoreCase("add")) {
             guildPermission.debug("operation add");
-            if (hasPermission(addPermission, message.getMember())) {
+            if (memberHasPermission(addPermission, message.getMember())) {
                 guildPermission.debug("add members set to guildPermission");
-                guildPermission.addMember(permMembers, permission);
+                guildPermission.addPermissionIDs(permMembers, permission);
 
-                Helper.sendPrivateMessage(sender, "You successfully added the permission *" + permission + "* to: " + memberBuilder.toString());
-                guildPermission.modLog(sender.getAsMention() + ": added the permission *" + permission + "* to: " + memberBuilder.toString());
+                Helper.sendPrivateMessage(sender, "You successfully added the permission *" + permission + "* to: " + memberJoiner.toString());
+                guildPermission.modLog(sender.getAsMention() + ": added the permission *" + permission + "* to: " + memberJoiner.toString());
             }
         } else if (args[0].equalsIgnoreCase("remove")){
             guildPermission.debug("operation remove");
-            if (hasPermission(removePermission, message.getMember())) {
+            if (memberHasPermission(removePermission, message.getMember())) {
                 guildPermission.debug("remove members set from guildPermission");
-                guildPermission.removeMember(permMembers, permission);
+                guildPermission.removePermissionIDs(permMembers, permission);
 
-                Helper.sendPrivateMessage(sender, "You successfully removed the permission *" + permission + "* from: " + memberBuilder.toString());
-                guildPermission.modLog(sender.getAsMention() + ": removed the permission *" + permission + "* from: " + memberBuilder.toString());
+                Helper.sendPrivateMessage(sender, "You successfully removed the permission *" + permission + "* from: " + memberJoiner.toString());
+                guildPermission.modLog(sender.getAsMention() + ": removed the permission *" + permission + "* from: " + memberJoiner.toString());
             }
         }
 
@@ -153,7 +150,7 @@ public class PermissionCommand implements BotCommand {
     }
 
     private boolean get(String[] args, Message message, User sender, GuildPermission guildPermission) {
-        if (!hasPermission(getPermission, message.getMember())) {
+        if (!memberHasPermission(getPermission, message.getMember())) {
             return false;
         }
 
@@ -174,16 +171,11 @@ public class PermissionCommand implements BotCommand {
         guildPermission.debug("initializing builder");
         StringBuilder builder = new StringBuilder();
 
-        guildPermission.debug("check for mentioned members");
-        if (!message.getMentionedMembers().isEmpty()) {
-            guildPermission.debug("adding mentioned members");
-            addPermissionMembers(message.getMentionedMembers(), builder, guildPermission);
-        }
-        guildPermission.debug("check for mentioned roles");
-        if (!message.getMentionedRoles().isEmpty()) {
-            guildPermission.debug("adding mentioned roles");
-            addPermissionRoles(message.getMentionedRoles(), builder, guildPermission);
-        }
+        guildPermission.debug("adding mentioned members");
+        addPermissionMembers(message.getMentionedMembers(), builder, guildPermission);
+
+        guildPermission.debug("adding mentioned roles");
+        addPermissionRoles(message.getMentionedRoles(), builder, guildPermission);
 
         String result = builder.toString().trim();
         if (result.equals("")) {
@@ -202,30 +194,14 @@ public class PermissionCommand implements BotCommand {
 
     private void addPermissionMembers(List<Member> members, StringBuilder builder, GuildPermission guildPermission) {
         members.forEach(member -> {
-            builder.append("\nMember: @").append(member.getUser().getName());
-            builder.append("\nRawPermissions: ");
-            addMemberPermissions(member.getId(), builder, guildPermission);
+            builder.append(guildPermission.getPermissionUser(member).toString()).append("\n");
 
             addPermissionRoles(member.getRoles(), builder, guildPermission);
         });
     }
 
     private void addPermissionRoles(List<Role> roles, StringBuilder builder, GuildPermission guildPermission) {
-        roles.forEach(role -> {
-            builder.append("\nRole: @").append(role.getName());
-            builder.append("\nRolePermissions: ");
-
-            addMemberPermissions(role.getId(), builder, guildPermission);
-        });
-    }
-
-    private void addMemberPermissions(String id, StringBuilder builder, GuildPermission guildPermission) {
-        Set<String> memberPermissions = guildPermission.getMemberPermissions(id);
-        if (memberPermissions != null) {
-            memberPermissions.forEach(s -> builder.append("\n- ").append(s.toLowerCase()));
-        } else {
-            builder.append("\n").append("- No permissions found");
-        }
+        roles.forEach(role -> builder.append(guildPermission.getPermissionRole(role).toString()).append("\n"));
     }
 
     private void sendHelp(User user) {

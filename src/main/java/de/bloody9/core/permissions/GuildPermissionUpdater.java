@@ -1,4 +1,4 @@
-package de.bloody9.core.config;
+package de.bloody9.core.permissions;
 
 import de.bloody9.core.Bot;
 import de.bloody9.core.models.objects.UpdatableGuildObject;

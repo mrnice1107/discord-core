@@ -1,13 +1,9 @@
 package de.bloody9.core;
 
-import de.bloody9.core.commands.*;
-import de.bloody9.core.commands.bot.HelpCommand;
-import de.bloody9.core.commands.bot.LogCommand;
-import de.bloody9.core.commands.bot.PermissionCommand;
-import de.bloody9.core.commands.console.CMDLogLevel;
-import de.bloody9.core.commands.console.CMDUpdate;
-import de.bloody9.core.config.GuildPermission;
-import de.bloody9.core.config.GuildPermissionUpdater;
+import de.bloody9.core.commands.CommandManager;
+import de.bloody9.core.commands.bot.*;
+import de.bloody9.core.commands.console.*;
+import de.bloody9.core.permissions.*;
 import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.interfaces.ConfigUpdater;
 import de.bloody9.core.models.objects.PermissionObject;
@@ -34,12 +30,23 @@ import java.util.List;
 
 import static de.bloody9.core.logging.Logger.*;
 
-
-
 public class Bot {
 
+
+    /**
+     * With this method a {@link BotInitObject} will get generated with the given parameters.
+     * When the parameters are not given, it will ask to enter them via command line.
+     * @param args parameters parameters:
+     *             <p>-d | name of database
+     *             <p>-u | mysql username<p>
+     *             <p>-p | mysql password<p>
+     *             <p>-t | discord bot token<p>
+     *             <p>-prefix | bot command prefix<p>
+     *             <p>-l | {@link LogLevel}
+     * @return {@link BotInitObject}
+     */
     public static BotInitObject enterArgs(String[] args) {
-        String sqlUser = null, sqlPw = null, dcToken = null, prefix = null;
+        String sqlUser = null, sqlPw = null, dcToken = null, prefix = null, sqlDatabase = null;
 
         for (int i = 0; i < args.length - 1; i++) {
             String arg = args[i].toLowerCase();
@@ -47,6 +54,11 @@ public class Bot {
             if (arg.startsWith("-")) {
                 String next = args[i + 1];
                 switch (arg) {
+                    case "-d": {
+                        sqlDatabase = next;
+                        i++;
+                        break;
+                    }
                     case "-u": {
                         sqlUser = next;
                         i++;
@@ -69,10 +81,11 @@ public class Bot {
                     }
                     case "-l": {
                         i++;
+                        next = next.toUpperCase();
                         if (LogLevel.contains(next)) {
                             setLogLevel(LogLevel.valueOf(next));
                         } else {
-                            warn("Loglevel: " + next + " is no valid loglevel");
+                            warn("Loglevel: \"" + next + "\" is no valid loglevel");
                         }
                         break;
                     }
@@ -83,6 +96,9 @@ public class Bot {
             }
         }
 
+        if (sqlDatabase == null) {
+            sqlDatabase = Helper.getLineFromConsole("Please enter the sql database:");
+        }
         if (sqlUser == null) {
             sqlUser = Helper.getLineFromConsole("Please enter the sql user:");
         }
@@ -96,7 +112,7 @@ public class Bot {
             prefix = Helper.getLineFromConsole("Please enter the bots command prefix:");
         }
 
-        BotInitObject initObject = new BotInitObject(sqlUser, sqlPw, dcToken, prefix);
+        BotInitObject initObject = new BotInitObject(sqlDatabase, sqlUser, sqlPw, dcToken, prefix);
 
         debug(initObject.toString());
 
@@ -192,7 +208,7 @@ public class Bot {
         setInitialJDAStatus(builder);
         setInitialJDASettings(builder);
         addEventListener(builder, initObject.getCommandPrefix());
-        addPermissions();
+        addPermissions(permissions);
     }
 
     public void afterInit(BotInitObject initObject) {
@@ -210,7 +226,7 @@ public class Bot {
         updater.add(new GuildPermissionUpdater());
     }
 
-    public void addPermissions() {
+    public void addPermissions(List<PermissionObject> permissions) {
         debug("adding permissions");
     }
 
@@ -221,11 +237,12 @@ public class Bot {
         commands.put("help", new HelpCommand());
         commands.put("permission", new PermissionCommand());
         commands.put("log", new LogCommand());
+        commands.put("activity", new ActivityCommand());
     }
 
     public void initializeSQL(BotInitObject initObject) {
         debug("initialize sql");
-        MySQLConnection.init(initObject.getSqlUser(), initObject.getSqlPassword());
+        MySQLConnection.init(initObject);
     }
 
     public void setInitialJDAStatus(JDABuilder builder) {
@@ -277,12 +294,12 @@ public class Bot {
     }
 
     public void setStatus(OnlineStatus status) {
-        debug("Set activity count to: " + status);
+        debug("Set online to: " + status);
         getJda().getPresence().setStatus(status);
     }
 
     public void setActivity(Activity activity) {
-        debug("Set activity count to: " + activity);
+        info("Set activity: " + Helper.getActivityAsString(activity));
         getJda().getPresence().setActivity(activity);
     }
 

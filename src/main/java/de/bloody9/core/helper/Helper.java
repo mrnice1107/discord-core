@@ -1,7 +1,8 @@
 package de.bloody9.core.helper;
 
-import de.bloody9.core.config.GuildPermission;
+import de.bloody9.core.permissions.GuildPermission;
 import de.bloody9.core.mysql.MySQLConnection;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -42,10 +43,19 @@ public class Helper {
         }
     }
 
-    public static List<String> getObjectFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
-        String sqlQuery = constructQueryString(column, table, query);
 
-        List<String> results = new ArrayList<>();
+
+    public static boolean isOwner(@NotNull Member member) {
+        return isOwner(member.getUser(), member.getGuild());
+    }
+    public static boolean isOwner(@NotNull User user, @NotNull Guild guild) {
+        return user.getId().equals(guild.getOwnerId());
+    }
+
+    public static List<String> getObjectFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
+        final String sqlQuery = constructQueryString(column, table, query);
+
+        final List<String> results = new ArrayList<>();
         try {
             Connection con = MySQLConnection.getConnection();
             debug("building connection: " + con.toString());
@@ -124,7 +134,7 @@ public class Helper {
         return list.get(0);
     }
 
-    private static String constructQueryString(@NotNull String column, @NotNull String table, @Nullable String query) {
+    public static String constructQueryString(@NotNull String column, @NotNull String table, @Nullable String query) {
         debug("getting object from DB");
         //example query "SELECT <column> FROM <table> WHERE <query>"
         StringBuilder builder = new StringBuilder();
@@ -139,37 +149,6 @@ public class Helper {
         builder.append(";");
         debug("query string: " + builder.toString());
         return builder.toString();
-    }
-
-    public static boolean hasPermission(@NotNull String permission, Member member) {
-        debug("has permission: " + permission);
-        if (member == null) {
-            error("Can't check permission because member is null: " + permission);
-            return false;
-        }
-        debug("member: " + member.getUser().getName());
-
-        Guild guild = member.getGuild();
-
-        GuildPermission guildPermission = GuildPermission.getGuildPermissionByID(guild.getId());
-        guildPermission.debug("guildPermission: " + guildPermission.toString());
-
-        boolean hasPerm = guildPermission.hasPermission(permission, member);
-
-        if (!hasPerm) {
-            Member owner = member.getGuild().getOwner();
-            if (owner != null && owner.getId().equals(member.getId())) {
-                guildPermission.debug("member is guild owner");
-                Helper.sendPrivateMessage(member, "You don't have the permission *" + permission + "* but you are owner so you can do this anyway :D");
-                return true;
-            } else {
-                guildPermission.debug("member has no permission");
-                sendPrivateMessage(member, "You have not enough permission to do this!\nMissing permission:*" + permission + "*");
-            }
-        }
-        guildPermission.debug("member has permission");
-
-        return hasPerm;
     }
 
 
@@ -199,7 +178,11 @@ public class Helper {
         return new SimpleDateFormat(format).format(date);
     }
 
-
+    public static String censor(String toCensor) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (char character : toCensor.toCharArray()) stringBuilder.append((Math.random() * 100 < 80) ? "*": character);
+        return stringBuilder.toString();
+    }
 
     public static String getInsertSQL(String table, String contentType, String content) {
         String sql = "INSERT INTO <table> (<contentType>) VALUES(<content>);";
@@ -227,7 +210,7 @@ public class Helper {
 
     public static boolean executeDeleteSQL(String table, String query) { return MySQLConnection.executeUpdate(getDeleteSQL(table, query)); }
 
-    public static boolean executeInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String queryOnUpdate) { return MySQLConnection.executeUpdate(getInsertUpdateOnDuplicateSQL(table, contentType, content, queryOnUpdate)); }
+    public static boolean executeInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String onUpdate) { return MySQLConnection.executeUpdate(getInsertUpdateOnDuplicateSQL(table, contentType, content, onUpdate)); }
 
 
 
@@ -235,5 +218,45 @@ public class Helper {
         System.out.println(out);
         Scanner in = new Scanner(System.in);
         return in.nextLine();
+    }
+
+    public static String getActivityAsString(@NotNull Activity activity) {
+        String type = activity.getType().name().toLowerCase();
+        return (type.equals("default")) ? "playing" : type + " " + activity.getName();
+    }
+
+
+
+
+
+
+
+
+
+    @Deprecated
+    public static boolean hasPermission(@NotNull String permission, @NotNull Member member) {
+        debug("check if member has permission");
+        debug("permission: " + permission);
+        debug("member: " + member.getUser().getName());
+
+        Guild guild = member.getGuild();
+
+        GuildPermission guildPermission = GuildPermission.getGuildPermissionByID(guild.getId());
+        boolean hasPerm = guildPermission.hasPermission(permission, member);
+
+        if (!hasPerm) {
+            Member owner = member.getGuild().getOwner();
+            if (owner != null && owner.getId().equals(member.getId())) {
+                guildPermission.debug("member is guild owner");
+                sendPrivateMessage(member, "You don't have the permission *" + permission + "* but you are owner so you can do this anyway :D");
+                return true;
+            } else {
+                guildPermission.debug("member has no permission");
+                sendPrivateMessage(member, "You have not enough permission to do this!\nMissing permission:*" + permission + "*");
+            }
+        }
+        guildPermission.debug("member has permission");
+
+        return hasPerm;
     }
 }

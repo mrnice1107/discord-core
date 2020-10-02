@@ -6,16 +6,13 @@ import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.objects.GuildObject;
 import de.bloody9.core.models.objects.PermissionObject;
 import de.bloody9.core.mysql.MySQLConnection;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static de.bloody9.core.helper.Helper.hasPermission;
+import static de.bloody9.core.helper.PermissionHelper.memberHasPermission;
 import static de.bloody9.core.logging.Logger.debug;
 
 public class LogCommand implements BotCommand {
@@ -71,7 +68,7 @@ public class LogCommand implements BotCommand {
         debug("message: " + message.getContentRaw());
         debug("args: " + Arrays.toString(args));
 
-        if (!hasPermission(generalPermission, message.getMember())) {
+        if (!memberHasPermission(generalPermission, message.getMember())) {
             return false;
         }
 
@@ -113,11 +110,11 @@ public class LogCommand implements BotCommand {
                     return false;
                 }
                 TextChannel textChannel = mentionedChannels.get(0);
-                if (!MySQLConnection.executeUpdate(Helper.getInsertUpdateOnDuplicateSQL(
+                if (!Helper.executeInsertUpdateOnDuplicateSQL(
                         TABLE,
                         GUILD_ID + "," + LOG_CHANNEL_ID,
                         guild.getId() + "," + textChannel.getId(),
-                        GUILD_ID + "=" + guild.getId()))) {
+                        LOG_CHANNEL_ID + "=" + textChannel.getId())) {
                     guildObject.warn("Failed to insert or update the log channel: " + textChannel.getId());
                     return false;
                 }

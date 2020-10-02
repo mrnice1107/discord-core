@@ -1,6 +1,16 @@
 package de.bloody9.core.models.objects;
 
+/**
+ * This object includes required information for the discord bot to start
+ * includes:
+ * sql database name
+ * sql user
+ * sql password
+ * discord bot token
+ * bot command prefix
+ */
 public class BotInitObject {
+    private String SqlDatabase;
     private String SqlUser;
     private String SqlPassword;
 
@@ -8,13 +18,13 @@ public class BotInitObject {
 
     private String commandPrefix;
 
-    public BotInitObject(String sqlUser, String sqlPassword, String discordToken, String commandPrefix) {
+    public BotInitObject(String SqlDatabase, String sqlUser, String sqlPassword, String discordToken, String commandPrefix) {
+        this.SqlDatabase = SqlDatabase;
         this.SqlUser = sqlUser;
         this.SqlPassword = sqlPassword;
         this.DiscordToken = discordToken;
         this.commandPrefix = commandPrefix;
     }
-
 
     @Override
     public String toString() {
@@ -24,6 +34,15 @@ public class BotInitObject {
                 ", DiscordToken='" + DiscordToken + '\'' +
                 ", commandPrefix='" + commandPrefix + '\'' +
                 '}';
+    }
+
+    public String getSqlDatabase() {
+        return SqlDatabase;
+    }
+
+    public BotInitObject setSqlDatabase(String sqlDatabase) {
+        SqlDatabase = sqlDatabase;
+        return this;
     }
 
     public String getSqlUser() {

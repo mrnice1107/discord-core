@@ -6,6 +6,7 @@ import de.bloody9.core.helper.Helper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.stream.Collector;
 
 public class Logger {
 
@@ -15,10 +16,12 @@ public class Logger {
 
     private static LogLevel logLevel = null;
 
-    private static final String prefixError = Colors.ANSI_RED + "[ERROR]";
+    private static final String prefixError = Colors.ANSI_Bold + Colors.ANSI_RED + "[ERROR]";
     private static final String prefixInfo = Colors.ANSI_WHITE + "[INFO]";
     private static final String prefixWarn = Colors.ANSI_YELLOW + "[WARN]";
     private static final String prefixDebug = Colors.ANSI_PURPLE + "[DEBUG]";
+    private static final String prefixTest = Colors.ANSI_Bold + Colors.ANSI_BLUE + "[TEST]";
+
     private static final String prefixLog = "[LOG]";
 
     private static boolean initialized = false;
@@ -70,7 +73,8 @@ public class Logger {
             return -1;
         }
         switch (logLevel) {
-            case DEBUG: return 0;
+            case DEBUG: //same as TEST
+            case TEST: return 0;
             case INFO: return 1;
             case WARN: return 2;
             case ERROR: return 3;
@@ -151,6 +155,7 @@ public class Logger {
 
 
     public static void logLine(String fullLogMessage) {
+        if (logLevel.equals(LogLevel.TEST)) return;
         if (!initialized) {
             init();
         }
@@ -166,6 +171,12 @@ public class Logger {
             e.printStackTrace();
         }
     }
+
+    private static void testInLogger(CharSequence message) { writeInLogger(prefixTest, message, LogLevel.TEST); }
+    public static void test(CharSequence message, int lowerTrace) { write(prefixTest, message, lowerTrace, LogLevel.TEST); }
+    public static void test(CharSequence message) { test(message, 0); }
+    public static void test(Object obj, int lowerTrace) { test(String.valueOf(obj), lowerTrace); }
+    public static void test(Object obj) { test(String.valueOf(obj), 0); }
 
     private static void logInLogger(CharSequence message) { logLine(constructMessageInLogger(message, prefixLog, false)); }
     public static void log(CharSequence message, int lowerTrace) { logLine(constructMessage(message, prefixLog, lowerTrace, false)); }
