@@ -3,6 +3,7 @@ package de.bloody9.core;
 import de.bloody9.core.commands.CommandManager;
 import de.bloody9.core.commands.bot.*;
 import de.bloody9.core.commands.console.*;
+import de.bloody9.core.logging.Logger;
 import de.bloody9.core.permissions.*;
 import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.interfaces.ConfigUpdater;
@@ -128,7 +129,7 @@ public class Bot {
     private boolean running;
     private JDA jda;
     private final CommandManager commandManager;
-    private final String commandPrefix;
+    private String commandPrefix;
 
     private Updater updater;
 
@@ -238,6 +239,7 @@ public class Bot {
         commands.put("permission", new PermissionCommand());
         commands.put("log", new LogCommand());
         commands.put("activity", new ActivityCommand());
+        commands.put("prefix", new PrefixCommand());
     }
 
     public void initializeSQL(BotInitObject initObject) {
@@ -259,7 +261,7 @@ public class Bot {
 
     public void addEventListener(JDABuilder builder, String prefix) {
         debug("add event listeners");
-        builder.addEventListeners(new CommandListener(prefix));
+        builder.addEventListeners(new CommandListener());
     }
 
     public void addConsoleCommands(HashMap<String, SimpleCommand> consoleCommands) {
@@ -319,6 +321,11 @@ public class Bot {
     public void setRunning(boolean running) { this.running = running; }
 
     public CommandManager getCommandManager() { return commandManager; }
+
+    public void setCommandPrefix(String commandPrefix) {
+        Logger.info("new prefix was set: " + commandPrefix);
+        this.commandPrefix = commandPrefix;
+    }
 
     public String getCommandPrefix() { return commandPrefix; }
 

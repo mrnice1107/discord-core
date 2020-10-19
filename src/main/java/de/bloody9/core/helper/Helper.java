@@ -1,5 +1,7 @@
 package de.bloody9.core.helper;
 
+import de.bloody9.core.Bot;
+import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.permissions.GuildPermission;
 import de.bloody9.core.mysql.MySQLConnection;
 import net.dv8tion.jda.api.entities.Activity;
@@ -178,10 +180,35 @@ public class Helper {
         return new SimpleDateFormat(format).format(date);
     }
 
+    public static String constructHelp(String helpMessage) {
+        return helpMessage.replace("<prefix>", getCommandPrefix());
+    }
+
+    public static String getCommandPrefix() {
+        return Bot.INSTANCE.getCommandPrefix();
+    }
+
     public static String censor(String toCensor) {
         StringBuilder stringBuilder = new StringBuilder();
-        for (char character : toCensor.toCharArray()) stringBuilder.append((Math.random() * 100 < 80) ? "*": character);
+        for (char character : toCensor.toCharArray()) stringBuilder.append((Math.random() * 100 < 70) ? "*": character);
         return stringBuilder.toString();
+    }
+
+    public static String getCommandHelp(String command) {
+        command = command.toLowerCase();
+        BotCommand cmd = Bot.INSTANCE.getCommandManager().getCommands().get(command);
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("\n").append(command).append(": ");
+        if (cmd != null) {
+            builder
+                    .append("\nDescription: ").append(cmd.getDescription())
+                    .append("\nHelp: ").append(cmd.getHelp())
+                    .append("\nAliases: ").append(cmd.getAlias());
+        } else {
+            builder.append("This command dose not exist");
+        }
+        return builder.toString();
     }
 
     public static String getInsertSQL(String table, String contentType, String content) {

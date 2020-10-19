@@ -1,5 +1,7 @@
 package de.bloody9.core.models.objects;
 
+import static de.bloody9.core.helper.Helper.censor;
+
 /**
  * This object includes required information for the discord bot to start
  * includes:
@@ -29,9 +31,10 @@ public class BotInitObject {
     @Override
     public String toString() {
         return "BotInitObject{" +
-                "SqlUser='" + SqlUser + '\'' +
-                ", SqlPassword='" + SqlPassword + '\'' +
-                ", DiscordToken='" + DiscordToken + '\'' +
+                "SqlDatabase='" + SqlDatabase + '\'' +
+                ", SqlUser='" + censor(SqlUser) + '\'' +
+                ", SqlPassword='" + censor(SqlPassword) + '\'' +
+                ", DiscordToken='" + censor(DiscordToken) + '\'' +
                 ", commandPrefix='" + commandPrefix + '\'' +
                 '}';
     }

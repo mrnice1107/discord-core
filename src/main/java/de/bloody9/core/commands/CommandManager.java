@@ -1,10 +1,13 @@
 package de.bloody9.core.commands;
 
 import de.bloody9.core.helper.Helper;
+import de.bloody9.core.exceptions.Command.BotCommandException;
 import de.bloody9.core.models.interfaces.BotCommand;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -23,42 +26,61 @@ public class CommandManager {
     }
 
     public boolean performCommand(String command, User sender, Message message, String[] args) {
-        info("user: " + sender.getName() + ":" + sender.getId() + ", executing command:" + message.getContentDisplay());
-        boolean result;
+        info("user: " + sender.getAsTag() + ", executing command:" + message.getContentDisplay());
+
+        debug("command:" + command);
+        debug("arguments: " + Arrays.toString(args));
+
+        boolean failed = true;
+        boolean removeMsg = true;
         if (command.equals("")) {
             debug("command is empty");
-            result = this.commands.get("help").performCommand(null, sender, null, null);
+            removeMsg = getBotCommand("help").performCommand(null, sender, null, null);
         } else {
             debug("command is: " + command);
-            BotCommand cmd = this.commands.get(command.toLowerCase());
+            BotCommand cmd = getBotCommand(command);
             if (cmd != null) {
                 debug("ServerCommand found");
                 try {
                     debug("performing command");
-                    result = cmd.performCommand(command, sender, message, args);
+                    removeMsg = cmd.performCommand(command, sender, message, args);
                     debug("performing done");
+                } catch (BotCommandException failedExecution) {
+                    error("Command:" + command);
+                    error("Failed to execute command because: " + failedExecution.getMessage());
+                    failed = false;
                 } catch (Exception ex) {
                     error(ex);
                     Helper.sendPrivateMessage(sender, "An error occurred while executing your command: " + ex.toString());
-                    result =  false;
+                    failed = false;
                 }
             } else {
                 debug("ServerCommand not found performCommand help");
                 Helper.sendPrivateMessage(sender, "Command not found:\n" + message.getContentDisplay());
-                result = this.commands.get("help").performCommand(null, sender, null, null);
+                removeMsg = getBotCommand("help").performCommand(null, sender, null, null);
             }
         }
 
-        debug("delete initial command message on discord");
-        message.delete().delay(1000L, TimeUnit.MILLISECONDS).queue();
+        if (removeMsg) {
+            debug("delete initial command message on discord");
+            message.delete().delay(1000L, TimeUnit.MILLISECONDS).queue();
+        }
 
-        debug("result of command:" + result);
-        return result;
+        debug("result of command:" + failed);
+        return failed;
     }
 
     public Map<String, BotCommand> getCommands() {
         return commands;
     }
 
+    public BotCommand getBotCommand(@NotNull String command) {
+        String searchCmd = command.toLowerCase();
+        if (commands.containsKey(searchCmd)) {
+            return commands.get(searchCmd);
+        }
+
+        return this.commands.values().stream().filter(cmd -> cmd.getAlias().contains(searchCmd)).findFirst().orElse(null);
+    }
 
 }

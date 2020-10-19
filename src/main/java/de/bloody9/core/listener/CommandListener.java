@@ -4,6 +4,8 @@ import static de.bloody9.core.logging.Logger.info;
 
 import de.bloody9.core.Bot;
 import de.bloody9.core.commands.CommandManager;
+import de.bloody9.core.commands.bot.HelpCommand;
+import de.bloody9.core.helper.Helper;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -17,17 +19,12 @@ import java.util.Arrays;
 
 public class CommandListener extends ListenerAdapter {
 
-    private final String prefix;
-
-    public CommandListener(String prefix) {
-        this.prefix = prefix;
-    }
-
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
         String messageAsSting = event.getMessage().getContentDisplay(); // received message (with formatting's and stuff)
 
         if (event.isFromType(ChannelType.TEXT)) { // only server text channel
+            final String prefix = Helper.getCommandPrefix();
             if (messageAsSting.toLowerCase().startsWith(prefix)) {
                 String[] args = messageAsSting.substring(prefix.length()).trim().split(" ");
 

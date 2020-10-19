@@ -1,15 +1,12 @@
 package de.bloody9.core.commands.bot;
 
-import de.bloody9.core.Bot;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.objects.GuildObject;
 import de.bloody9.core.models.objects.PermissionObject;
-import de.bloody9.core.mysql.MySQLConnection;
 import net.dv8tion.jda.api.entities.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static de.bloody9.core.helper.PermissionHelper.memberHasPermission;
@@ -23,29 +20,37 @@ public class LogCommand implements BotCommand {
     private final String generalPermission = "commands.log";
 
     private final List<PermissionObject> permissionObjects;
+    private final List<String> aliases;
     private final String description;
 
     private final String help;
 
-    public LogCommand() {
-        String prefix = Bot.INSTANCE.getCommandPrefix();
-        permissionObjects = new ArrayList<>();
 
+    public LogCommand() {
+        permissionObjects = new ArrayList<>();
         permissionObjects.add(new PermissionObject(generalPermission, "Execute command"));
+
+        aliases = new ArrayList<>();
+        aliases.add("logging");
 
         description = "With this command you can set the log channel for the Bots log entries!";
 
         help = "Log Command\n"
-                + prefix + " log get/set <#channel>\n";
+                + "<prefix> log get/set <#channel>\n";
     }
 
     private void sendHelp(User user) {
-        Helper.sendPrivateMessage(user, help);
+        Helper.sendPrivateMessage(user, getHelp());
+    }
+
+    @Override
+    public List<String> getAlias() {
+        return aliases;
     }
 
     @Override
     public String getHelp() {
-        return help;
+        return Helper.constructHelp(help);
     }
 
     @Override
@@ -62,11 +67,6 @@ public class LogCommand implements BotCommand {
     public boolean performCommand(String command, User sender, Message message, String[] args) {
 
         debug("start guildCommand");
-
-        debug("command: " + command);
-        debug("sender: " + sender.getName() + ":" + sender.getId());
-        debug("message: " + message.getContentRaw());
-        debug("args: " + Arrays.toString(args));
 
         if (!memberHasPermission(generalPermission, message.getMember())) {
             return false;

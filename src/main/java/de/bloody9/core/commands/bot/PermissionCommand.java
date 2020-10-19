@@ -1,6 +1,9 @@
 package de.bloody9.core.commands.bot;
 
 import de.bloody9.core.Bot;
+import de.bloody9.core.exceptions.Command.NoPermissionCommandException;
+import de.bloody9.core.exceptions.Command.NotEnoughArgumentCommandException;
+import de.bloody9.core.exceptions.Command.WrongArgumentCommandException;
 import de.bloody9.core.permissions.GuildPermission;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.models.interfaces.BotCommand;
@@ -20,13 +23,17 @@ public class PermissionCommand implements BotCommand {
     private final String getPermission = "permissions.manage.get";
 
     private final List<PermissionObject> permissionObjects;
+    private final List<String> aliases;
     private final String description;
 
     private final String help;
 
     public PermissionCommand() {
-        String prefix = Bot.INSTANCE.getCommandPrefix();
         permissionObjects = new ArrayList<>();
+        aliases = new ArrayList<>();
+
+        aliases.add("perm");
+        aliases.add("permissions");
 
         permissionObjects.add(new PermissionObject(generalPermission, "Execute command"));
         permissionObjects.add(new PermissionObject(addPermission, "Add permission to users and roles"));
@@ -38,13 +45,19 @@ public class PermissionCommand implements BotCommand {
                 "You can also get all available permissions or the permissions of a @member or @role";
 
         help = "Permission Command\n"
-                + prefix + " permission add/remove <permission> <@Role/@Member>\n"
-                + prefix + " permission get [<@Role/@Member/permission>]";
+                + "<prefix> permission add/remove <permission> <@Role/@Member>\n"
+                + "<prefix> permission get [<@Role/@Member/permission>]";
+    }
+
+
+    @Override
+    public List<String> getAlias() {
+        return aliases;
     }
 
     @Override
     public String getHelp() {
-        return help;
+        return Helper.constructHelp(help);
     }
 
     @Override
@@ -62,19 +75,14 @@ public class PermissionCommand implements BotCommand {
 
         debug("start guildCommand");
 
-        debug("command: " + command);
-        debug("sender: " + sender.getName() + ":" + sender.getId());
-        debug("message: " + message.getContentRaw());
-        debug("args: " + Arrays.toString(args));
-
         if (!memberHasPermission(generalPermission, message.getMember())) {
-            return false;
+            throw new NoPermissionCommandException(sender, generalPermission);
         }
 
         debug("check args.length > 0");
         if (args.length == 0) {
             sendHelp(sender);
-            return false;
+            throw new NotEnoughArgumentCommandException(args.length);
         }
 
         debug("init: get guild, guildPermission");
@@ -90,7 +98,7 @@ public class PermissionCommand implements BotCommand {
         if (args.length < 3) {
             guildPermission.debug("args to small, stop perform (send help to user)");
             sendHelp(sender);
-            return false;
+            throw new NotEnoughArgumentCommandException(args.length);
         }
         guildPermission.debug("args not to small, continue");
 
@@ -98,7 +106,7 @@ public class PermissionCommand implements BotCommand {
         if (!args[0].equalsIgnoreCase("add") && !args[0].equalsIgnoreCase("remove")) {
             guildPermission.debug("args wrong (send help to user)");
             sendHelp(sender);
-            return false;
+            throw new WrongArgumentCommandException();
         }
         guildPermission.debug("args 0: okay");
         guildPermission.debug("init: members set (new empty set)");
@@ -151,10 +159,10 @@ public class PermissionCommand implements BotCommand {
 
     private boolean get(String[] args, Message message, User sender, GuildPermission guildPermission) {
         if (!memberHasPermission(getPermission, message.getMember())) {
-            return false;
+            throw new NoPermissionCommandException(sender, getPermission);
         }
 
-        if (args.length < 2) {
+        if (args.length == 1) {
             guildPermission.debug("getting permissions");
 
             StringBuilder builder = new StringBuilder();
@@ -205,7 +213,7 @@ public class PermissionCommand implements BotCommand {
     }
 
     private void sendHelp(User user) {
-        Helper.sendPrivateMessage(user, help);
+        Helper.sendPrivateMessage(user, getHelp());
     }
 
     private void addPermission(PermissionObject permission, StringBuilder builder, GuildPermission guildPermission) {
