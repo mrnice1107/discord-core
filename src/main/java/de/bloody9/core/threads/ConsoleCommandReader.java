@@ -1,10 +1,9 @@
 package de.bloody9.core.threads;
 
 import de.bloody9.core.Bot;
-import de.bloody9.core.logging.LogLevel;
-import de.bloody9.core.logging.Logger;
 import de.bloody9.core.models.interfaces.SimpleCommand;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.OnlineStatus;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -41,13 +40,18 @@ public class ConsoleCommandReader extends Thread {
                 String key = line.toLowerCase();
                 if (key.equals("exit")) {
                     debug("shutting down bot!");
+
+                    bot.onShutdown();
+
                     JDA jda = bot.getJda();
                     if (jda != null) {
+                        bot.setStatus(OnlineStatus.OFFLINE);
 
                         jda.shutdown();
                         info("-----------------");
                         info("Shutting down bot");
                         info("-----------------");
+
                         bot.setRunning(false);
                     }
                     reader.close();
@@ -64,7 +68,9 @@ public class ConsoleCommandReader extends Thread {
                             SimpleCommand cmd = commands.get(command);
 
                             args = Arrays.copyOfRange(args, 1, args.length);
-                            cmd.perform(command, args);
+                            if (!cmd.perform(command, args)) {
+                                info(help);
+                            }
                         } else {
                             info(help);
                         }

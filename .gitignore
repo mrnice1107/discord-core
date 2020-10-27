@@ -1,3 +1,9 @@
 target/
+log/
+*.class
+*.jar
+*.war
+*.ear
+*.logs
 *.iml
-*.idea
+.idea/

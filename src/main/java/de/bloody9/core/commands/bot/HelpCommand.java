@@ -16,35 +16,33 @@ public class HelpCommand implements BotCommand {
 
     private final List<PermissionObject> permissionObjects;
     private final String description;
-    private final String prefix;
 
     private final String help;
+    private final List<String> aliases;
 
     public HelpCommand() {
-        prefix = Bot.INSTANCE.getCommandPrefix();
-
         permissionObjects = new ArrayList<>();
+        aliases = new ArrayList<>();
+
+        aliases.add("?");
 
         description = "With this command you can get a list of every command and more details to each command";
 
         help = "Usage of 'Help Command':\n"
-                + prefix + " help [commands...]";
+                + "<prefix> help [commands...]";
     }
 
     @Override
-    public String getHelp() {
-        return help;
-    }
+    public List<String> getAlias() { return aliases; }
 
     @Override
-    public String getDescription() {
-        return description;
-    }
+    public String getHelp() { return Helper.constructHelp(help); }
 
     @Override
-    public List<PermissionObject> getPermissions() {
-        return permissionObjects;
-    }
+    public String getDescription() { return description; }
+
+    @Override
+    public List<PermissionObject> getPermissions() { return permissionObjects; }
 
 
     @Override
@@ -58,22 +56,14 @@ public class HelpCommand implements BotCommand {
             builder.append("Here you can see a list for all commands from the (")
                     .append(bot.getJda().getSelfUser().getName())
                     .append(")\nIf you want further information for a specific command use:\n")
-                    .append(help)
+                    .append(getHelp())
                     .append("\nCommands:\n");
 
-            bot.getCommandManager().getCommands().keySet().forEach(key -> builder.append(prefix).append(" ").append(key).append("\n"));
+            bot.getCommandManager().getCommands().keySet().forEach(key -> builder.append(Helper.getCommandPrefix()).append(" ").append(key).append("\n"));
         } else {
             builder.append("Here are some details for your commands:");
-            for (String arg : args) {
-                arg = arg.toLowerCase();
-                BotCommand cmd = bot.getCommandManager().getCommands().get(arg);
-                builder.append("\n").append(arg).append(": ");
-                if (cmd != null) {
-                    builder.append("\n").append(cmd.getDescription()).append("\n").append(cmd.getHelp());
-                } else {
-                    builder.append("This command dose not exist");
-                }
-
+            for (String cmd : args) {
+                builder.append(Helper.getCommandHelp(cmd));
             }
         }
 

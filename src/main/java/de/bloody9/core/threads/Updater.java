@@ -4,7 +4,8 @@ package de.bloody9.core.threads;
 import static de.bloody9.core.logging.Logger.*;
 
 import de.bloody9.core.Bot;
-import de.bloody9.core.models.objects.ConfigObject;
+import de.bloody9.core.exceptions.Feature.FeatureLoadException;
+import de.bloody9.core.models.objects.UpdatableGuildObject;
 import de.bloody9.core.models.interfaces.ConfigUpdater;
 
 import java.util.List;
@@ -51,22 +52,26 @@ public class Updater extends Thread {
     public synchronized void update() {
         info("Updating");
         updateConfigs();
+        updateOthers();
+        info("Done updating");
     }
 
-    private synchronized void updateConfigs() {
+    public synchronized void updateConfigs() {
         debug("setting counter: 0");
         counter = 0;
 
         debug("foreach every loaded guild and init ConfigObjects");
-        instance.getJda().getGuilds().forEach(guild -> {
-            updater.forEach(up -> up.getGuildConfigByGuildID(guild.getId()));
-        });
+        instance.getJda().getGuilds().forEach(guild -> updater.forEach(up -> up.getGuildConfigByGuildID(guild.getId())));
 
         debug("Reloading all loaded ConfigObjects");
-        updater.forEach(up -> up.getGuildAllConfigs().forEach(ConfigObject::load));
+        try {
+            updater.forEach(up -> up.getGuildAllConfigs().forEach(UpdatableGuildObject::update));
+        } catch (FeatureLoadException e) {
+            error(e);
+        }
     }
 
-    private synchronized void updateOthers() {
+    public synchronized void updateOthers() {
         debug("doing other updates");
     }
 

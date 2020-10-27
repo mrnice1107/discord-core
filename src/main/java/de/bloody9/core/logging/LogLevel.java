@@ -1,11 +1,18 @@
 package de.bloody9.core.logging;
 
+/**
+ * Enum of all possible log levels for logger<p>
+ * includes:<p>
+ *     DEBUG, INFO, WARN, ERROR, LOG, TEST
+ *
+ */
 public enum  LogLevel {
     DEBUG,
     INFO,
     WARN,
     ERROR,
-    LOG;
+    LOG,
+    TEST;
 
     public static boolean contains(String test) {
 

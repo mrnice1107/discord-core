@@ -1,9 +1,10 @@
 package de.bloody9.core.listener;
 
-import static de.bloody9.core.logging.Logger.info;
+import static de.bloody9.core.logging.Logger.*;
 
 import de.bloody9.core.Bot;
 import de.bloody9.core.commands.CommandManager;
+import de.bloody9.core.helper.Helper;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -17,17 +18,11 @@ import java.util.Arrays;
 
 public class CommandListener extends ListenerAdapter {
 
-    private final String prefix;
-
-    public CommandListener(String prefix) {
-        this.prefix = prefix;
-    }
-
     @Override
     public void onMessageReceived(@Nonnull MessageReceivedEvent event) {
-        String messageAsSting = event.getMessage().getContentDisplay(); // received message (with formatting's and stuff)
-
-        if (event.isFromType(ChannelType.TEXT)) { // only server text channel
+        if (event.isFromType(ChannelType.TEXT) && !event.getAuthor().isBot()) { // only server text channel
+            final String messageAsSting = event.getMessage().getContentDisplay(); // received message (with formatting's and stuff)
+            final String prefix = Helper.getCommandPrefix();
             if (messageAsSting.toLowerCase().startsWith(prefix)) {
                 String[] args = messageAsSting.substring(prefix.length()).trim().split(" ");
 
@@ -41,7 +36,7 @@ public class CommandListener extends ListenerAdapter {
                     String command = args[0];
                     args = Arrays.copyOfRange(args, 1, args.length);
                     if (!commandManager.performCommand(command, sender, message, args)) {
-                        info("Something went wrong by executing the command: " + command
+                        warn("Something went wrong by executing the command: " + command
                                 + ", with the arguments: " + Arrays.toString(args)
                                 + ", in the channel: " + channel.getAsMention()
                                 + ", send form: " + sender.getAsMention());
@@ -51,9 +46,5 @@ public class CommandListener extends ListenerAdapter {
                 }
             }
         }
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 }
