@@ -3,12 +3,10 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\BotExce
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Mentioned\NoMentionedMembersCommandException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\BotInitObject.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Mentioned\NoMentionedChannelsCommandException.java
-D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\ClearCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\interfaces\BotCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\GuildObject.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Feature\FeatureException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\console\CMDUpdate.java
-D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\BanCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Command\WrongArgumentCommandException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\Main.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\interfaces\ConfigUpdater.java
@@ -22,7 +20,6 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\permissions\GuildP
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Command\NoPermissionCommandException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\permissions\GuildPermissionUpdater.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\PermissionObject.java
-D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\KickCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Feature\FeatureLoadException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Mentioned\NoMentionedRolesCommandException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\PermissionCommand.java
@@ -33,7 +30,6 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\logging\Colors.jav
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\Bot.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Command\BotCommandException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Command\NotEnoughArgumentCommandException.java
-D:\Projects\github\discord-core\src\main\java\de\bloody9\core\listener\JoinListener.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\threads\Updater.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\threads\ConsoleCommandReader.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\helper\PermissionHelper.java
