@@ -1,5 +1,6 @@
 package de.bloody9.core.commands.bot;
 
+import de.bloody9.core.exceptions.Command.*;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.objects.GuildObject;
@@ -69,7 +70,7 @@ public class LogCommand implements BotCommand {
         debug("start guildCommand");
 
         if (!memberHasPermission(generalPermission, message.getMember())) {
-            return false;
+            throw new NoPermissionCommandException(sender, generalPermission);
         }
 
         debug("check args.length > 0");

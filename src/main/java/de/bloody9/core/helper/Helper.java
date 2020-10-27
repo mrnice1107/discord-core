@@ -2,12 +2,8 @@ package de.bloody9.core.helper;
 
 import de.bloody9.core.Bot;
 import de.bloody9.core.models.interfaces.BotCommand;
-import de.bloody9.core.permissions.GuildPermission;
 import de.bloody9.core.mysql.MySQLConnection;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,10 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 import static de.bloody9.core.logging.Logger.debug;
 import static de.bloody9.core.logging.Logger.error;
@@ -130,9 +123,18 @@ public class Helper {
         return results;
     }
 
+    public static String getIdAsMentioned(@NotNull String userId) {
+        return "<@" + userId + ">";
+    }
+
     public static String getFirstObjectFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
         List<String> list = getObjectFromDB(column, table, query);
         if (list.isEmpty()) return null;
+        return list.get(0);
+    }
+    public static int getFirstIntegerFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
+        List<Integer> list = getIntegerFromDB(column, table, query);
+        if (list.isEmpty()) return -1;
         return list.get(0);
     }
 
@@ -153,9 +155,39 @@ public class Helper {
         return builder.toString();
     }
 
+    public static void clearAllMessagesInChannel(@Nullable String messageID, @NotNull TextChannel channel) {
+        while (true) {
+            if (!clearAmountOfMessagesInChannel(messageID, channel,100)) break;
+        }
+    }
 
-    public static void createFile(String path) throws IOException {
-        createFile(new File(path));
+    public static boolean clearAmountOfMessagesInChannel(@Nullable String messageID, @NotNull TextChannel channel, int limit) {
+        if (limit > 100) {
+            limit = 100;
+        } else if (limit <= 0) {
+            limit = 1;
+        }
+
+        if (messageID == null) {
+            messageID = channel.getLatestMessageId();
+        }
+
+        MessageHistory history = channel.getHistoryBefore(messageID, limit).complete();
+        if (history.isEmpty()) {
+            return false;
+        } else if (history.size() == 1) {
+            channel.deleteMessageById(history.getRetrievedHistory().get(0).getId()).queue();
+            return false;
+        } else {
+            channel.deleteMessages(history.getRetrievedHistory()).complete();
+            return true;
+        }
+    }
+
+    public static File createFile(String path) throws IOException {
+        File file = new File(path);
+        createFile(file);
+        return file;
     }
 
     public static void createFile(File file) throws IOException {
@@ -250,40 +282,5 @@ public class Helper {
     public static String getActivityAsString(@NotNull Activity activity) {
         String type = activity.getType().name().toLowerCase();
         return (type.equals("default")) ? "playing" : type + " " + activity.getName();
-    }
-
-
-
-
-
-
-
-
-
-    @Deprecated
-    public static boolean hasPermission(@NotNull String permission, @NotNull Member member) {
-        debug("check if member has permission");
-        debug("permission: " + permission);
-        debug("member: " + member.getUser().getName());
-
-        Guild guild = member.getGuild();
-
-        GuildPermission guildPermission = GuildPermission.getGuildPermissionByID(guild.getId());
-        boolean hasPerm = guildPermission.hasPermission(permission, member);
-
-        if (!hasPerm) {
-            Member owner = member.getGuild().getOwner();
-            if (owner != null && owner.getId().equals(member.getId())) {
-                guildPermission.debug("member is guild owner");
-                sendPrivateMessage(member, "You don't have the permission *" + permission + "* but you are owner so you can do this anyway :D");
-                return true;
-            } else {
-                guildPermission.debug("member has no permission");
-                sendPrivateMessage(member, "You have not enough permission to do this!\nMissing permission:*" + permission + "*");
-            }
-        }
-        guildPermission.debug("member has permission");
-
-        return hasPerm;
     }
 }

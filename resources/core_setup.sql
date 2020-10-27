@@ -5,8 +5,14 @@
 CREATE DATABASE core_database;
 USE core_database;
 
-# This setting is required so you can delete things without doing a WHERE on a unique key
+# This guild_bansguild_bansguild_banssetting is required so you can delete things without doing a WHERE on a unique key
 SET SQL_SAFE_UPDATES = 0;
+
+CREATE TABLE guild_bans
+(
+	member_id char(18),
+	guild_id char(18)
+);
 
 CREATE TABLE guild_logs
 (

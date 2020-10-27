@@ -3,23 +3,22 @@ package de.bloody9.core;
 import de.bloody9.core.commands.CommandManager;
 import de.bloody9.core.commands.bot.*;
 import de.bloody9.core.commands.console.*;
-import de.bloody9.core.logging.Logger;
-import de.bloody9.core.permissions.*;
-import de.bloody9.core.models.interfaces.BotCommand;
-import de.bloody9.core.models.interfaces.ConfigUpdater;
-import de.bloody9.core.models.objects.PermissionObject;
-import de.bloody9.core.mysql.MySQLConnection;
+import de.bloody9.core.feature.Feature;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.listener.CommandListener;
+import de.bloody9.core.listener.JoinListener;
 import de.bloody9.core.logging.LogLevel;
+import de.bloody9.core.models.interfaces.*;
 import de.bloody9.core.models.objects.BotInitObject;
-import de.bloody9.core.models.interfaces.SimpleCommand;
-import de.bloody9.core.threads.ConsoleCommandReader;
-import de.bloody9.core.threads.Updater;
+import de.bloody9.core.models.objects.PermissionObject;
+import de.bloody9.core.mysql.MySQLConnection;
+import de.bloody9.core.permissions.*;
+import de.bloody9.core.threads.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
@@ -33,17 +32,16 @@ import static de.bloody9.core.logging.Logger.*;
 
 public class Bot {
 
-
     /**
      * With this method a {@link BotInitObject} will get generated with the given parameters.
      * When the parameters are not given, it will ask to enter them via command line.
-     * @param args parameters parameters:
-     *             <p>-d | name of database
-     *             <p>-u | mysql username<p>
-     *             <p>-p | mysql password<p>
-     *             <p>-t | discord bot token<p>
-     *             <p>-prefix | bot command prefix<p>
-     *             <p>-l | {@link LogLevel}
+     * @param args {@link String}[] parameters:
+     *             <p>-d | name of database</p>
+     *             <p>-u | mysql username</p>
+     *             <p>-p | mysql password</p>
+     *             <p>-t | discord bot token</p>
+     *             <p>-prefix | bot command prefix</p>
+     *             <p>-l | {@link LogLevel}</p>
      * @return {@link BotInitObject}
      */
     public static BotInitObject enterArgs(String[] args) {
@@ -126,6 +124,8 @@ public class Bot {
 
     private final List<PermissionObject> permissions;
 
+    public final List<Feature> features;
+
     private boolean running;
     private JDA jda;
     private final CommandManager commandManager;
@@ -137,7 +137,6 @@ public class Bot {
         this(enterArgs(args));
     }
 
-
     public Bot(BotInitObject initObject) {
         info("------------");
         info("Initializing");
@@ -145,17 +144,22 @@ public class Bot {
 
         preInit(initObject);
 
+        initializeSQL(initObject);
+
         debug("setting instance");
         INSTANCE = this;
 
         debug("setting command prefix: " + initObject.getCommandPrefix());
         commandPrefix = initObject.getCommandPrefix();
 
-        debug("initializing guild permission configs");
+        debug("initializing guild permission configs and permission list");
         guildPermissions = new ArrayList<>();
-
-        debug("initializing permission list");
         permissions = new ArrayList<>();
+
+        debug("initializing features");
+        features = new ArrayList<>();
+        addFeatures();
+        checkFeatures();
 
         debug("initializing commands");
         HashMap<String, BotCommand> commands = new HashMap<>();
@@ -164,21 +168,15 @@ public class Bot {
         debug("initializing command manager");
         commandManager = new CommandManager(commands);
 
-        debug("loading JDA");
-        try {
-            debug("try get jda builder");
-            JDABuilder builder = JDABuilder.createDefault(initObject.getDiscordToken());
-
-            init(initObject, builder);
-
-            debug("build jda");
-            jda = builder.build();
-        } catch (LoginException e) {
-            error(e);
+        debug("initializing JDA");
+        if (!initializeJDA(initObject)) {
+            error("Shutting down bot because bot failed to initialize JDA");
+            return;
         }
-        debug("jda was build successfully");
 
         afterInit(initObject);
+
+        startUpdater();
 
         running = true;
 
@@ -199,52 +197,90 @@ public class Bot {
         close();
     }
 
-    public void preInit(BotInitObject initObject) {
-        debug("pre initializing");
-        initializeSQL(initObject);
+    // main initialization of JDA
+    private boolean initializeJDA(BotInitObject initObject) {
+        try {
+            debug("try get jda builder");
+            JDABuilder builder = JDABuilder.createDefault(initObject.getDiscordToken());
+
+            List<ListenerAdapter> listener = new ArrayList<>();
+            addEventListener(listener);
+
+            builder.addEventListeners(listener.toArray());
+
+            addPermissions(permissions);
+
+            init(initObject, builder);
+
+            debug("build jda");
+            jda = builder.build();
+        } catch (LoginException | IllegalArgumentException e) {
+            error(e);
+            return false;
+        }
+
+        debug("done building jda");
+        return true;
     }
 
+
+
+
+    /*
+    *
+    * Initializing
+    *
+    * */
+
+
+
+
+    /**
+     * <p>This method is called before the initialization of the bot</p>
+     * <p>{@link JDABuilder} is not build </p>
+     */
+    public void preInit(BotInitObject initObject) {
+        debug("pre initializing with: " + initObject.toString());
+    }
+
+    /**
+     * <p>This method is called while the initialization of the bot</p>
+     * <p>This method contains the set of the initial JDA status and settings</p>
+     * <p>{@link JDABuilder} is building </p>
+     */
     public void init(BotInitObject initObject, JDABuilder builder) {
-        debug("initializing");
+        debug("initializing with: " + initObject.toString());
         setInitialJDAStatus(builder);
         setInitialJDASettings(builder);
-        addEventListener(builder, initObject.getCommandPrefix());
-        addPermissions(permissions);
     }
 
+    /**
+     * <p>This method is called while the initialization of the bot</p>
+     * <p>{@link JDABuilder} is build </p>
+     */
     public void afterInit(BotInitObject initObject) {
-        debug("after initializing");
-
-        startUpdater();
+        debug("after initializing with: " + initObject.toString());
     }
 
-    public void onShutdown() {
-        debug("shutting down bot");
-    }
 
-    public void addConfigUpdater(List<ConfigUpdater> updater) {
-        debug("adding config updater");
-        updater.add(new GuildPermissionUpdater());
-    }
 
-    public void addPermissions(List<PermissionObject> permissions) {
-        debug("adding permissions");
-    }
 
-    public void addBotCommands(HashMap<String, BotCommand> commands) {
-        debug("adding bot commands");
-
-        // commands must be lower case
-        commands.put("help", new HelpCommand());
-        commands.put("permission", new PermissionCommand());
-        commands.put("log", new LogCommand());
-        commands.put("activity", new ActivityCommand());
-        commands.put("prefix", new PrefixCommand());
-    }
-
+    /**
+     * <p>Initialization of {@link MySQLConnection}</p>
+     * Automatically called in {@link Bot} constructor
+     * */
     public void initializeSQL(BotInitObject initObject) {
         debug("initialize sql");
         MySQLConnection.init(initObject);
+    }
+
+    public void initUpdater() {
+        debug("adding config updater");
+        List<ConfigUpdater> configUpdater = new ArrayList<>();
+        addConfigUpdater(configUpdater);
+
+        debug("initialize updater");
+        updater = new Updater(configUpdater);
     }
 
     public void setInitialJDAStatus(JDABuilder builder) {
@@ -259,15 +295,80 @@ public class Bot {
         builder.setMemberCachePolicy(MemberCachePolicy.ALL);
     }
 
-    public void addEventListener(JDABuilder builder, String prefix) {
+
+
+
+    /*
+     *
+     * Add
+     *
+     * */
+
+
+
+
+    public void addFeatures() {
+        debug("adding features");
+    }
+
+    public void addEventListener(List<ListenerAdapter> listener) {
         debug("add event listeners");
-        builder.addEventListeners(new CommandListener());
+        listener.add(new CommandListener());
+        listener.add(new JoinListener());
+
+        debug("event listener from features");
+        features.stream().filter(Feature::isEnabled).forEach(feature -> listener.addAll(feature.getListeners()));
+    }
+
+    public void addBotCommands(HashMap<String, BotCommand> commands) {
+        debug("adding bot commands");
+
+        // commands must be lower case
+        commands.put("help", new HelpCommand());
+        commands.put("permission", new PermissionCommand());
+        commands.put("log", new LogCommand());
+        commands.put("activity", new ActivityCommand());
+        commands.put("prefix", new PrefixCommand());
+        commands.put("ban", new BanCommand());
+        commands.put("kick", new KickCommand());
+        commands.put("clear", new ClearCommand());
+
+        debug("adding bot commands from features");
+        features.stream().filter(Feature::isEnabled).forEach(feature -> commands.putAll(feature.getCommands()));
+    }
+
+    public void addConfigUpdater(List<ConfigUpdater> updater) {
+        debug("adding config updater");
+        updater.add(new GuildPermissionUpdater());
+
+        debug("adding config updater from features");
+        features.stream().filter(Feature::isEnabled).forEach(feature -> updater.addAll(feature.getConfigUpdaters()));
+    }
+
+    public void addPermissions(List<PermissionObject> permissions) {
+        debug("adding permissions");
     }
 
     public void addConsoleCommands(HashMap<String, SimpleCommand> consoleCommands) {
         consoleCommands.put("loglevel", new CMDLogLevel());
         consoleCommands.put("update", new CMDUpdate());
     }
+
+    public void addGuildPermission(GuildPermission guildPermission) {
+        debug("adding new guildPermission object");
+        this.guildPermissions.add(guildPermission);
+    }
+
+
+
+
+    /*
+     *
+     * Start / Stop
+     *
+     * */
+
+
 
     public void startConsoleCommandReader() {
         HashMap<String, SimpleCommand> commands = new HashMap<>();
@@ -282,13 +383,58 @@ public class Bot {
         updater.start();
     }
 
-    public void initUpdater() {
-        debug("adding config updater");
-        List<ConfigUpdater> configUpdater = new ArrayList<>();
-        addConfigUpdater(configUpdater);
+    /**
+     * <p>This method is called when the bot is shutting down</p>
+     * <p>You can unload stuff here</p>
+     */
+    public void onShutdown() {
+        debug("shutting down bot");
+    }
 
-        debug("initialize updater");
-        updater = new Updater(configUpdater);
+
+
+
+
+
+    private void checkFeatures() {
+        debug("checking features");
+
+        List<String> featureStr = new ArrayList<>();
+        features.forEach(feature -> featureStr.add(feature.getName().toLowerCase()));
+
+        // checks if dependencies are available
+        debug("check if required features are included");
+        features.stream().filter(feature -> checkFeature(featureStr, feature)).forEach(Feature::enable);
+
+        // checks if dependencies are enabled
+        features.stream().filter(Feature::isEnabled).forEach(feature -> {
+            if (feature.requiredFeatures().stream().allMatch(s -> getFeature(s).isEnabled())) {
+                info("Feature: " + feature.toString() + " is enabled");
+            } else {
+                feature.disable();
+                warn("Failed to load feature " + feature.toString() + " because required features are not available!");
+            }
+        });
+    }
+
+    private boolean checkFeature(List<String> features, Feature feature) {
+        return feature.requiredFeatures().stream().map(String::toLowerCase).allMatch(features::contains);
+    }
+
+
+
+
+
+
+    /*
+     *
+     * Getter / Setter
+     *
+     * */
+
+
+    public Feature getFeature(String name) {
+        return features.stream().filter(feature -> feature.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
     public List<PermissionObject> getPermissions() {
@@ -309,11 +455,6 @@ public class Bot {
         return guildPermissions;
     }
 
-    public void addGuildPermission(GuildPermission guildPermission) {
-        debug("adding new guildPermission object");
-        this.guildPermissions.add(guildPermission);
-    }
-
     public JDA getJda() { return jda; }
 
     public boolean isRunning() { return running; }
@@ -323,7 +464,7 @@ public class Bot {
     public CommandManager getCommandManager() { return commandManager; }
 
     public void setCommandPrefix(String commandPrefix) {
-        Logger.info("new prefix was set: " + commandPrefix);
+        info("new prefix was set: " + commandPrefix);
         this.commandPrefix = commandPrefix;
     }
 

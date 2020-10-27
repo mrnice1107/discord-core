@@ -37,11 +37,12 @@ public class Logger {
         try {
             String fileName = "log/log_" + Helper.getTime("yyyy_MM_dd_HH_mm_ss") + ".logs";
 
-            File logfile = new File(fileName);
-            Helper.createFile(logfile);
+            File logfile = Helper.createFile(fileName);
 
             writer = new FileWriter(logfile);
             lines = 0;
+
+            System.out.println("Logger initialized, file:" + logfile.getAbsolutePath());
         } catch (IOException e) {
             e.printStackTrace();
         }

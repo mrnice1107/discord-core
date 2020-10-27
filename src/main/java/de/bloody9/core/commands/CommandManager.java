@@ -31,7 +31,7 @@ public class CommandManager {
         debug("command:" + command);
         debug("arguments: " + Arrays.toString(args));
 
-        boolean failed = true;
+        boolean success = true;
         boolean removeMsg = true;
         if (command.equals("")) {
             debug("command is empty");
@@ -40,19 +40,19 @@ public class CommandManager {
             debug("command is: " + command);
             BotCommand cmd = getBotCommand(command);
             if (cmd != null) {
-                debug("ServerCommand found");
+                debug("BotCommand found");
                 try {
                     debug("performing command");
                     removeMsg = cmd.performCommand(command, sender, message, args);
                     debug("performing done");
                 } catch (BotCommandException failedExecution) {
-                    error("Command:" + command);
-                    error("Failed to execute command because: " + failedExecution.getMessage());
-                    failed = false;
+                    warn("Command:" + command);
+                    warn("Failed to execute command because: " + failedExecution.getMessage());
+                    success = false;
                 } catch (Exception ex) {
                     error(ex);
                     Helper.sendPrivateMessage(sender, "An error occurred while executing your command: " + ex.toString());
-                    failed = false;
+                    success = false;
                 }
             } else {
                 debug("ServerCommand not found performCommand help");
@@ -63,11 +63,11 @@ public class CommandManager {
 
         if (removeMsg) {
             debug("delete initial command message on discord");
-            message.delete().delay(1000L, TimeUnit.MILLISECONDS).queue();
+            message.delete().delay(1, TimeUnit.SECONDS).queue();
         }
 
-        debug("result of command:" + failed);
-        return failed;
+        debug("result of command:" + success);
+        return success;
     }
 
     public Map<String, BotCommand> getCommands() {
@@ -81,6 +81,14 @@ public class CommandManager {
         }
 
         return this.commands.values().stream().filter(cmd -> cmd.getAlias().contains(searchCmd)).findFirst().orElse(null);
+    }
+
+    public boolean addBotCommand(@NotNull String name, @NotNull BotCommand command) {
+        if (commands.containsKey(name)) {
+            return false;
+        }
+        commands.put(name, command);
+        return true;
     }
 
 }
