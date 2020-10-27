@@ -3,6 +3,7 @@ de\bloody9\core\listener\CommandListener.class
 de\bloody9\core\exceptions\BotException.class
 de\bloody9\core\exceptions\Mentioned\NoMentionedCommandException.class
 de\bloody9\core\models\objects\PermissionObject.class
+de\bloody9\core\commands\bot\ClearCommand.class
 de\bloody9\core\exceptions\Command\BotCommandException.class
 de\bloody9\core\exceptions\Command\WrongArgumentCommandException.class
 de\bloody9\core\exceptions\Mentioned\NoMentionedChannelsCommandException.class
@@ -24,13 +25,16 @@ de\bloody9\core\exceptions\Feature\FeatureLoadException.class
 de\bloody9\core\commands\CommandManager.class
 de\bloody9\core\models\objects\GuildObject.class
 de\bloody9\core\permissions\GuildPermissionUpdater.class
+de\bloody9\core\commands\bot\BanCommand.class
 de\bloody9\core\exceptions\Command\NoNumberCommandException.class
 de\bloody9\core\logging\Logger$1.class
 de\bloody9\core\exceptions\Command\NoPermissionCommandException.class
 de\bloody9\core\permissions\GuildPermission.class
 de\bloody9\core\models\interfaces\SimpleCommand.class
 de\bloody9\core\helper\PermissionHelper.class
+de\bloody9\core\commands\bot\KickCommand.class
 de\bloody9\core\commands\bot\LogCommand.class
+de\bloody9\core\listener\JoinListener.class
 de\bloody9\core\exceptions\Command\NotEnoughArgumentCommandException.class
 de\bloody9\core\feature\Feature.class
 de\bloody9\core\models\objects\PermissionUser.class
