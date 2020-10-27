@@ -7,6 +7,3 @@ public class Main {
     }
 
 }
-
-
-//todo release next full version (2.0.0)
