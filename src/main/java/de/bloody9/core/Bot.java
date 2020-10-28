@@ -317,7 +317,7 @@ public class Bot {
         listener.add(new JoinListener());
 
         debug("event listener from features");
-        features.stream().filter(Feature::isEnabled).forEach(feature -> listener.addAll(feature.getListeners()));
+        features.stream().filter(Feature::isEnabled).forEach(feature -> listener.addAll((feature.getListeners() != null) ? feature.getListeners() : new ArrayList<>()));
     }
 
     public void addBotCommands(HashMap<String, BotCommand> commands) {

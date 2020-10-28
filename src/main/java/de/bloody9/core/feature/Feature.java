@@ -7,18 +7,13 @@ import de.bloody9.core.models.interfaces.ConfigUpdater;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Feature {
 
     private final Map<String, BotCommand> commands;
     private final List<ListenerAdapter> listeners;
     private final List<ConfigUpdater> configUpdaters;
-
-    public static Feature INSTANCE;
 
     private boolean enabled;
 
@@ -30,16 +25,9 @@ public class Feature {
      * to the constructor.</p>
      */
     public Feature() {
-        INSTANCE = this;
-
         commands = new HashMap<>();
         listeners = new ArrayList<>();
         configUpdaters = new ArrayList<>();
-
-        addCommands(commands);
-        addListeners(listeners);
-        addUpdaters(configUpdaters);
-
     }
 
     /**
@@ -107,8 +95,8 @@ public class Feature {
     /**
      * Here you can add the features commands
      */
-    public Feature addCommands(Map<String, BotCommand> commands) {
-        debug("adding commands");
+    public Feature addCommand(String key, BotCommand command) {
+        commands.put(key, command);
 
         return this;
     }
@@ -116,8 +104,8 @@ public class Feature {
     /**
      * Here you can add the features listeners
      */
-    public Feature addListeners(List<ListenerAdapter> listeners) {
-        debug("adding listeners");
+    public Feature addListener(ListenerAdapter listener) {
+        listeners.add(listener);
 
         return this;
     }
@@ -125,8 +113,8 @@ public class Feature {
     /**
      * Here you can add the features configUpdaters
      */
-    public Feature addUpdaters(List<ConfigUpdater> configUpdaters) {
-        debug("adding configUpdaters");
+    public Feature addUpdater(ConfigUpdater configUpdater) {
+        configUpdaters.add(configUpdater);
 
         return this;
     }
