@@ -22,15 +22,22 @@ import static de.bloody9.core.models.objects.GuildObject.getGuildPrefix;
 
 
 public class Helper {
-    public static void sendPrivateMessage(@NotNull User user, String message) {
+    public static void sendPrivateMessage(@NotNull String message, @NotNull User user) {
         debug("sending private message: " + message + " to user: " + user.getName() + ":" + user.getId());
         user.openPrivateChannel().complete().sendMessage(message).queue();
     }
-    public static void sendPrivateMessage(@NotNull Member member, String message) {
+    public static void sendPrivateMessage(@NotNull String message, @NotNull Member member) {
+        sendPrivateMessage(member.getUser(), message);
+    }
+    public static void sendPrivateMessage(@NotNull User user, @NotNull String message) {
+        debug("sending private message: " + message + " to user: " + user.getName() + ":" + user.getId());
+        user.openPrivateChannel().complete().sendMessage(message).queue();
+    }
+    public static void sendPrivateMessage(@NotNull Member member, @NotNull String message) {
         sendPrivateMessage(member.getUser(), message);
     }
 
-    public static void sendOwner(String message, @NotNull Guild guild) {
+    public static void sendOwner(@NotNull String message, @NotNull Guild guild) {
         Member owner = guild.getOwner();
         if (owner != null) {
             debug(getGuildPrefix(guild) + "send message to guild owner: " + owner.getUser().getName());
@@ -135,6 +142,11 @@ public class Helper {
     public static int getFirstIntegerFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
         List<Integer> list = getIntegerFromDB(column, table, query);
         if (list.isEmpty()) return -1;
+        return list.get(0);
+    }
+    public static boolean getFirstBooleanFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {
+        List<Boolean> list = getBooleanFromDB(column, table, query);
+        if (list.isEmpty()) return false;
         return list.get(0);
     }
 

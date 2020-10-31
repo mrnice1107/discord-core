@@ -174,6 +174,9 @@ public class Bot {
             return;
         }
 
+        debug("loading features");
+        features.stream().filter(Feature::isEnabled).forEach(Feature::load);
+
         afterInit(initObject);
 
         startUpdater();

@@ -23,7 +23,10 @@ public class CommandManager {
 
         debug("added all commands to command list");
         debug("init done");
+        delete = true;
     }
+
+    private boolean delete;
 
     public boolean performCommand(String command, User sender, Message message, String[] args) {
         info("user: " + sender.getAsTag() + ", executing command:" + message.getContentDisplay());
@@ -61,9 +64,9 @@ public class CommandManager {
             }
         }
 
-        if (removeMsg) {
+        if (removeMsg && delete) {
             debug("delete initial command message on discord");
-            message.delete().delay(1, TimeUnit.SECONDS).queue();
+            message.delete().queueAfter(1, TimeUnit.SECONDS);
         }
 
         debug("result of command:" + success);
@@ -81,6 +84,10 @@ public class CommandManager {
         }
 
         return this.commands.values().stream().filter(cmd -> cmd.getAlias().contains(searchCmd)).findFirst().orElse(null);
+    }
+
+    public void setDeleteMessages(boolean delete) {
+        this.delete = delete;
     }
 
     public boolean addBotCommand(@NotNull String name, @NotNull BotCommand command) {

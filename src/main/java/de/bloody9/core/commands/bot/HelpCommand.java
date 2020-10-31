@@ -67,9 +67,6 @@ public class HelpCommand implements BotCommand {
             }
         }
 
-
-        debug("sending help to user: " + builder.toString());
-
         Helper.sendPrivateMessage(sender, builder.toString());
         return true;
     }
