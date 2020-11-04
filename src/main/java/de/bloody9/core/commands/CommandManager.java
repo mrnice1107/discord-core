@@ -90,6 +90,11 @@ public class CommandManager {
         this.delete = delete;
     }
 
+    /**
+     *
+     * Returns false if command already exists
+     *
+     * */
     public boolean addBotCommand(@NotNull String name, @NotNull BotCommand command) {
         if (commands.containsKey(name)) {
             return false;

@@ -127,6 +127,7 @@ public class Bot {
     public final List<Feature> features;
 
     private boolean running;
+    private boolean mergeModLog;
     private JDA jda;
     private final CommandManager commandManager;
     private String commandPrefix;
@@ -155,6 +156,9 @@ public class Bot {
         debug("initializing guild permission configs and permission list");
         guildPermissions = new ArrayList<>();
         permissions = new ArrayList<>();
+
+        debug("setting some default settings");
+        mergeModLog = true;
 
         debug("initializing features");
         features = new ArrayList<>();
@@ -476,4 +480,8 @@ public class Bot {
     public Updater getUpdater() { return updater; }
 
     public void setUpdater(Updater updater) { this.updater = updater; }
+
+    public boolean isMergeModLog() { return mergeModLog; }
+
+    public void setMergeModLog(boolean mergeModLog) { this.mergeModLog = mergeModLog; }
 }

@@ -14,6 +14,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 import static de.bloody9.core.logging.Logger.debug;
@@ -45,13 +47,15 @@ public class Helper {
         }
     }
 
-
-
     public static boolean isOwner(@NotNull Member member) {
         return isOwner(member.getUser(), member.getGuild());
     }
     public static boolean isOwner(@NotNull User user, @NotNull Guild guild) {
         return user.getId().equals(guild.getOwnerId());
+    }
+
+    public static boolean checkMessageOlderThen(@NotNull Message message, int durationInMin) {
+        return ChronoUnit.MINUTES.between(message.getTimeCreated().toInstant(), Instant.now()) > durationInMin;
     }
 
     public static List<String> getObjectFromDB(@NotNull String column, @NotNull String table, @Nullable String query) {

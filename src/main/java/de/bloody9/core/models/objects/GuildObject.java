@@ -1,10 +1,12 @@
 package de.bloody9.core.models.objects;
 
+import de.bloody9.core.Bot;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.logging.Logger;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.nio.charset.Charset;
@@ -65,9 +67,24 @@ public class GuildObject {
             loadModLogChannel();
         }
         if (modLogChannel != null) {
-            modLogChannel.sendMessage(message).queue();
+            if (!modlogMerge(message)) modLogChannel.sendMessage(message).queue();
         }
         return this;
+    }
+
+    private boolean modlogMerge(CharSequence message) {
+        Bot INSTANCE = Bot.INSTANCE;
+        if (INSTANCE.isMergeModLog()) {
+            String lastMessage = modLogChannel.getLatestMessageId();
+            Message msg = modLogChannel.retrieveMessageById(lastMessage).complete();
+            if (msg.getAuthor().getId().equals(INSTANCE.getJda().getSelfUser().getId())
+                    && !Helper.checkMessageOlderThen(msg, 10)
+                    && msg.getEmbeds().isEmpty()) {
+                msg.editMessage(msg.getContentRaw() + "\n" + message).queue();
+                return true;
+            }
+        }
+        return false;
     }
 
     public String modLogMessage(Object obj) { return modLogMessage(String.valueOf(obj)); }
