@@ -359,6 +359,7 @@ public class Bot {
     public void addConsoleCommands(HashMap<String, SimpleCommand> consoleCommands) {
         consoleCommands.put("loglevel", new CMDLogLevel());
         consoleCommands.put("update", new CMDUpdate());
+        consoleCommands.put("log", new CMDLogSave());
     }
 
     public void addGuildPermission(GuildPermission guildPermission) {

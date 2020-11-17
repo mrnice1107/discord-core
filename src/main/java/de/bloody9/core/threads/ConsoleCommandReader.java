@@ -28,7 +28,8 @@ public class ConsoleCommandReader extends Thread {
                 "Use 'exit' to shutdown\n" +
                 "Use 'update' to reload database\n" +
                 "Use 'help' for a list with the other commands\n" +
-                "Use 'loglevel log/error/warn/info/debug' to set the loglevel of the logger";
+                "Use 'loglevel log/error/warn/info/debug' to set the loglevel of the logger\n" +
+                "Use 'log' to save unsaved logs as file";
 
         String line;
         debug("get reader");
