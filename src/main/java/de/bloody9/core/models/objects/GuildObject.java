@@ -8,8 +8,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 
-import java.nio.charset.Charset;
 import java.util.List;
 
 public class GuildObject {
@@ -67,17 +67,25 @@ public class GuildObject {
             loadModLogChannel();
         }
         if (modLogChannel != null) {
-            if (!modlogMerge(message)) modLogChannel.sendMessage(message).queue();
+            if (!modLogMerge(message)) modLogChannel.sendMessage(message).queue();
         }
         return this;
     }
 
-    private boolean modlogMerge(CharSequence message) {
+    private boolean modLogMerge(CharSequence message) {
         Bot INSTANCE = Bot.INSTANCE;
         if (INSTANCE.isMergeModLog()) {
-            String lastMessage = modLogChannel.getLatestMessageId();
-            Message msg = modLogChannel.retrieveMessageById(lastMessage).complete();
-            if (msg.getAuthor().getId().equals(INSTANCE.getJda().getSelfUser().getId())
+            String lastMessage;
+            Message msg;
+            try {
+                lastMessage = modLogChannel.getLatestMessageId();
+                msg = modLogChannel.retrieveMessageById(lastMessage).complete();
+            } catch (IllegalStateException | ErrorResponseException e) {
+                warn("last log message got deleted!");
+                return false;
+            }
+            if (msg != null
+                    && msg.getAuthor().getId().equals(INSTANCE.getJda().getSelfUser().getId())
                     && !Helper.checkMessageOlderThen(msg, 10)
                     && msg.getEmbeds().isEmpty()) {
                 msg.editMessage(msg.getContentRaw() + "\n" + message).queue();

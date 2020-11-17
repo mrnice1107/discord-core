@@ -38,6 +38,9 @@ public class Helper {
     public static void sendPrivateMessage(@NotNull Member member, @NotNull String message) {
         sendPrivateMessage(member.getUser(), message);
     }
+    public static void sendPrivateMessage(@NotNull User user, @NotNull MessageEmbed embed) {
+        user.openPrivateChannel().complete().sendMessage(embed).queue();
+    }
 
     public static void sendOwner(@NotNull String message, @NotNull Guild guild) {
         Member owner = guild.getOwner();
