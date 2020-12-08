@@ -4,6 +4,7 @@ import de.bloody9.core.commands.CommandManager;
 import de.bloody9.core.commands.bot.*;
 import de.bloody9.core.commands.console.*;
 import de.bloody9.core.feature.Feature;
+import de.bloody9.core.feature.openbot.OpenBotFeature;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.listener.CommandListener;
 import de.bloody9.core.listener.JoinListener;
@@ -316,6 +317,8 @@ public class Bot {
 
     public void addFeatures() {
         debug("adding features");
+
+        features.add(new OpenBotFeature());
     }
 
     public void addEventListener(List<ListenerAdapter> listener) {
@@ -334,8 +337,6 @@ public class Bot {
         commands.put("help", new HelpCommand());
         commands.put("permission", new PermissionCommand());
         commands.put("log", new LogCommand());
-        commands.put("activity", new ActivityCommand());
-        commands.put("prefix", new PrefixCommand());
         commands.put("ban", new BanCommand());
         commands.put("kick", new KickCommand());
         commands.put("clear", new ClearCommand());
