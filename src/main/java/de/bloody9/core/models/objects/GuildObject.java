@@ -1,7 +1,6 @@
 package de.bloody9.core.models.objects;
 
 import de.bloody9.core.Bot;
-import de.bloody9.core.exceptions.Command.BotCommandException;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.logging.Logger;
 
@@ -12,8 +11,6 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
-import java.awt.desktop.PreferencesEvent;
 import java.util.List;
 
 public class GuildObject {
