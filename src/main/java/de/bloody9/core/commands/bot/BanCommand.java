@@ -38,8 +38,7 @@ public class BanCommand implements BotCommand {
         description = "With this command you can ban members from your discord";
 
         help = "Ban Command\n" +
-                "<prefix> ban <@Member> [<reason>]\n" +
-                "<prefix> banid <userId> [<reason>]";
+                "<prefix> ban <@Member / user id> [<reason>]";
     }
 
     private void sendHelp(User user) {
@@ -92,7 +91,7 @@ public class BanCommand implements BotCommand {
 
         Guild guild = message.getGuild();
 
-        if (command.equalsIgnoreCase("banid")) {
+        if (command.equalsIgnoreCase("banid") || checkIsIdBan(args[0],message.getMentionedMembers())) {
             return banId(sender, args, guild);
         }
 
@@ -116,6 +115,14 @@ public class BanCommand implements BotCommand {
         banMember.ban(0, reason).queue();
 
         return true;
+    }
+
+    private boolean checkIsIdBan(String arg, List<Member> members) {
+        if (members.isEmpty()) {
+            return true;
+        }
+
+        return !arg.equalsIgnoreCase("@" + members.get(0).getEffectiveName());
     }
 
     private String getReason(String[] args) {

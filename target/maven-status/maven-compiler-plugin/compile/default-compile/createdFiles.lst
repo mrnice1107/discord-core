@@ -43,6 +43,7 @@ de\bloody9\core\helper\PermissionHelper.class
 de\bloody9\core\commands\bot\KickCommand.class
 de\bloody9\core\commands\bot\LogCommand.class
 de\bloody9\core\listener\JoinListener.class
+de\bloody9\core\feature\openbot\OpenBotFeature.class
 de\bloody9\core\threads\ConsoleCommandReader.class
 de\bloody9\core\commands\bot\ActivityCommand.class
 de\bloody9\core\exceptions\Mentioned\NoMentionedMembersCommandException.class

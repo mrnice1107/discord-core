@@ -36,6 +36,7 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\console\C
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\Main.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\PrefixCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\PermissionRole.java
+D:\Projects\github\discord-core\src\main\java\de\bloody9\core\feature\openbot\OpenBotFeature.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\mysql\MySQLConnection.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\KickCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Feature\FeatureLoadException.java

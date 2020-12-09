@@ -1,6 +1,7 @@
 package de.bloody9.core.models.objects;
 
 import de.bloody9.core.Bot;
+import de.bloody9.core.exceptions.Command.BotCommandException;
 import de.bloody9.core.helper.Helper;
 import de.bloody9.core.logging.Logger;
 
@@ -9,10 +10,20 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nullable;
+import java.awt.desktop.PreferencesEvent;
 import java.util.List;
 
 public class GuildObject {
+
+    public enum ModLogStatus {
+        LOADED,
+        DELETED_CHANNEL,
+        NOT_CONFIGURED
+    }
+
     private static final String TABLE = "guild_logs";
     private static final String GUILD_ID = "guild_id";
     private static final String LOG_CHANNEL_ID = "log_channel_id";
@@ -23,18 +34,19 @@ public class GuildObject {
 
     private TextChannel modLogChannel = null;
 
+    private ModLogStatus modLogStatus = null;
+
     public GuildObject(Guild guild) {
         this.guild = guild;
         this.guildId = guild.getId();
         this.guildName = guild.getName();
-
-
     }
 
     public void loadModLogChannel() {
         List<String> idList = Helper.getObjectFromDB(LOG_CHANNEL_ID, TABLE, GUILD_ID + "=" + guild.getId());
         if (idList.isEmpty()) {
             Helper.sendOwner("There is no log channel configured", guild);
+            modLogStatus = ModLogStatus.NOT_CONFIGURED;
             return;
         }
         String channelId = idList.get(0);
@@ -42,9 +54,11 @@ public class GuildObject {
         TextChannel tx = guild.getTextChannelById(channelId);
         if (tx == null) {
             warn("Something went wrong by loading the log channel: " + channelId);
+            modLogStatus = ModLogStatus.DELETED_CHANNEL;
             return;
         }
         modLogChannel = tx;
+        modLogStatus = ModLogStatus.LOADED;
     }
 
     public GuildObject modLog(CharSequence message, EmbedBuilder builder) {
@@ -140,8 +154,37 @@ public class GuildObject {
     *
     * */
 
+    public boolean setModLogChannel(@NotNull TextChannel channel, @NotNull String modifier) {
+        if (setModLogChannel(channel)) {
+            modLog(modifier + " set new mod-log channel: " + channel.getAsMention());
+            return true;
+        }
+        return false;
+    }
+
+    private boolean setModLogChannel(@NotNull TextChannel channel) {
+
+        boolean result;
+        if (result = Helper.executeInsertUpdateOnDuplicateSQL(
+                TABLE,
+                GUILD_ID + "," + LOG_CHANNEL_ID,
+                getGuildId() + "," + channel.getId(),
+                LOG_CHANNEL_ID + "=" + channel.getId())) {
+            modLogChannel = channel;
+        }
+        else { warn("Failed to insert or update the log channel: " + channel.getId()); }
+
+        return result;
+    }
+
     public TextChannel getModLogChannel() {
+        if (modLogChannel == null) { loadModLogChannel(); }
         return modLogChannel;
+    }
+
+    public ModLogStatus getModLogStatus() {
+        if (modLogStatus == null) { loadModLogChannel(); }
+        return modLogStatus;
     }
 
     public String getGuildId() { return guildId; }
