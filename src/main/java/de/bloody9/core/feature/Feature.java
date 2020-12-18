@@ -4,16 +4,17 @@ import de.bloody9.core.Bot;
 import de.bloody9.core.logging.Logger;
 import de.bloody9.core.models.interfaces.BotCommand;
 import de.bloody9.core.models.interfaces.ConfigUpdater;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class Feature {
+public abstract class Feature {
 
-    private final Map<String, BotCommand> commands;
-    private final List<ListenerAdapter> listeners;
-    private final List<ConfigUpdater> configUpdaters;
+    protected final Map<String, BotCommand> commands;
+    protected final List<ListenerAdapter> listeners;
+    protected final List<ConfigUpdater> configUpdaters;
 
     private boolean enabled;
 
@@ -34,92 +35,39 @@ public class Feature {
      * @return returns the name of the features
      * */
     @NotNull
-    public String getName() {
-        return "EmptyFeature";
-    }
+    public abstract String getName();
 
     /**
      * @return returns the version of the features
      * */
     @NotNull
-    public String getVersion() {
-        return "1.0";
-    }
+    public abstract String getVersion();
 
     /**
      * @return returns a list of features that are required for ths feature to work
      * */
     @NotNull
-    public List<String> requiredFeatures() {
-        return new ArrayList<>();
-    }
+    public List<String> requiredFeatures() { return new ArrayList<>(); }
 
-    public Bot getBot() {
-        return Bot.INSTANCE;
-    }
+    public Bot getBot() { return Bot.INSTANCE; }
+
+    public JDA getJda() { return getBot().getJda(); }
 
     @Override
-    public String toString() {
-        return getName() + ":" + getVersion();
-    }
+    public final String toString() { return getName() + ":" + getVersion(); }
 
     /**
      * called when loading the feature
      */
     public void load() {
         if (!isEnabled()) return;
-        debug("load feature" + toString());
+        debug("load feature " + toString());
     }
 
     /**
      * called when unloading the feature
      */
-    public void unload() {
-        debug("unload feature" + toString());
-    }
-
-
-
-
-
-    //
-    //
-    // Adding classes
-    //
-    //
-
-    //    private final Map<String, BotCommand> commands;
-    //    private final List<ListenerAdapter> listeners;
-    //    private final List<ConfigUpdater> configUpdaters;
-
-    /**
-     * Here you can add the features commands
-     */
-    public Feature addCommand(String key, BotCommand command) {
-        commands.put(key, command);
-
-        return this;
-    }
-
-    /**
-     * Here you can add the features listeners
-     */
-    public Feature addListener(ListenerAdapter listener) {
-        listeners.add(listener);
-
-        return this;
-    }
-
-    /**
-     * Here you can add the features configUpdaters
-     */
-    public Feature addUpdater(ConfigUpdater configUpdater) {
-        configUpdaters.add(configUpdater);
-
-        return this;
-    }
-
-
+    public void unload() { debug("unload feature " + toString()); }
 
 
 
@@ -164,9 +112,6 @@ public class Feature {
     // Getter / Setter
     //
     //
-
-
-
 
 
 

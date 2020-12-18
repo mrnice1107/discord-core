@@ -29,6 +29,7 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Command
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\ActivityCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\UpdatableGuildObject.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\feature\Feature.java
+D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Feature\FeatureCommandException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\logging\Logger.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\interfaces\BotCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\GuildObject.java

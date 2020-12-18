@@ -12,6 +12,7 @@ de\bloody9\core\commands\bot\PermissionCommand.class
 de\bloody9\core\logging\Colors.class
 de\bloody9\core\logging\LogLevel.class
 de\bloody9\core\commands\bot\HelpCommand.class
+de\bloody9\core\commands\bot\LogCommand$1.class
 de\bloody9\core\exceptions\Mentioned\NoMentionedRolesCommandException.class
 de\bloody9\core\Main.class
 de\bloody9\core\threads\Updater.class
@@ -25,6 +26,7 @@ de\bloody9\core\exceptions\Command\NotEnoughArgumentCommandException.class
 de\bloody9\core\feature\Feature.class
 de\bloody9\core\models\objects\PermissionUser.class
 de\bloody9\core\models\interfaces\BotCommand.class
+de\bloody9\core\exceptions\Feature\FeatureCommandException.class
 de\bloody9\core\commands\bot\PrefixCommand.class
 de\bloody9\core\models\objects\PermissionRole.class
 de\bloody9\core\commands\console\CMDLogLevel.class
@@ -47,5 +49,6 @@ de\bloody9\core\feature\openbot\OpenBotFeature.class
 de\bloody9\core\threads\ConsoleCommandReader.class
 de\bloody9\core\commands\bot\ActivityCommand.class
 de\bloody9\core\exceptions\Mentioned\NoMentionedMembersCommandException.class
+de\bloody9\core\models\objects\GuildObject$ModLogStatus.class
 de\bloody9\core\mysql\MySQLConnection.class
 de\bloody9\core\exceptions\Feature\FeatureException.class

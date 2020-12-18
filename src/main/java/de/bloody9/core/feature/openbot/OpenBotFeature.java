@@ -28,7 +28,7 @@ public class OpenBotFeature extends Feature {
     }
 
     public void addCommands() {
-        addCommand("prefix", new PrefixCommand());
-        addCommand("activity", new ActivityCommand());
+        commands.put("prefix", new PrefixCommand());
+        commands.put("activity", new ActivityCommand());
     }
 }

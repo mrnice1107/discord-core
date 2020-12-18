@@ -30,7 +30,6 @@ public class GuildObject {
     private final String guildName;
 
     private TextChannel modLogChannel = null;
-
     private ModLogStatus modLogStatus = null;
 
     public GuildObject(Guild guild) {
@@ -39,7 +38,16 @@ public class GuildObject {
         this.guildName = guild.getName();
     }
 
-    public void loadModLogChannel() {
+    public GuildObject(GuildObject guildObject) {
+        this.guild = guildObject.guild;
+        this.guildId = guildObject.guildId;
+        this.guildName = guildObject.guildName;
+
+        this.modLogStatus = guildObject.modLogStatus;
+        this.modLogChannel = guildObject.modLogChannel;
+    }
+
+    public final void loadModLogChannel() {
         List<String> idList = Helper.getObjectFromDB(LOG_CHANNEL_ID, TABLE, GUILD_ID + "=" + guild.getId());
         if (idList.isEmpty()) {
             Helper.sendOwner("There is no log channel configured", guild);
@@ -58,7 +66,7 @@ public class GuildObject {
         modLogStatus = ModLogStatus.LOADED;
     }
 
-    public GuildObject modLog(CharSequence message, EmbedBuilder builder) {
+    public final GuildObject modLog(CharSequence message, EmbedBuilder builder) {
         info(message);
 
         if (modLogChannel == null) {
@@ -70,8 +78,8 @@ public class GuildObject {
         builder.clear();
         return this;
     }
-    public GuildObject modLog(Object obj) { modLog(String.valueOf(obj)); return this; }
-    public GuildObject modLog(CharSequence message) {
+    public final GuildObject modLog(Object obj) { modLog(String.valueOf(obj)); return this; }
+    public final GuildObject modLog(CharSequence message) {
         info(message);
 
         if (modLogChannel == null) {
@@ -106,8 +114,8 @@ public class GuildObject {
         return false;
     }
 
-    public String modLogMessage(Object obj) { return modLogMessage(String.valueOf(obj)); }
-    public String modLogMessage(CharSequence message) {
+    public final String modLogMessage(Object obj) { return modLogMessage(String.valueOf(obj)); }
+    public final String modLogMessage(CharSequence message) {
         info(message);
 
         if (modLogChannel == null) {
@@ -120,28 +128,28 @@ public class GuildObject {
         return null;
     }
 
-    public GuildObject test(CharSequence message) { Logger.test(getGuildPrefix() + message, 1); return this; }
-    public GuildObject test(Object obj) { test(String.valueOf(obj)); return this; }
+    public final GuildObject test(CharSequence message) { Logger.test(getPrefix() + message, 1); return this; }
+    public final GuildObject test(Object obj) { test(String.valueOf(obj)); return this; }
 
-    public GuildObject debug(CharSequence message) { Logger.debug(getGuildPrefix() + message, 1); return this; }
-    public GuildObject debug(Object obj) { debug(String.valueOf(obj)); return this; }
+    public final GuildObject debug(CharSequence message) { Logger.debug(getPrefix() + message, 1); return this; }
+    public final GuildObject debug(Object obj) { debug(String.valueOf(obj)); return this; }
 
-    public GuildObject info(CharSequence message) { Logger.info(getGuildPrefix() + message, 1); return this; }
-    public GuildObject info(Object obj) { info(String.valueOf(obj)); return this; }
+    public final GuildObject info(CharSequence message) { Logger.info(getPrefix() + message, 1); return this; }
+    public final GuildObject info(Object obj) { info(String.valueOf(obj)); return this; }
 
-    public GuildObject warn(CharSequence message) { Logger.warn(getGuildPrefix() + message, 1); return this; }
-    public GuildObject warn(Object obj) { warn(String.valueOf(obj)); return this; }
+    public final GuildObject warn(CharSequence message) { Logger.warn(getPrefix() + message, 1); return this; }
+    public final GuildObject warn(Object obj) { warn(String.valueOf(obj)); return this; }
 
-    public GuildObject error(CharSequence message) { Logger.error(getGuildPrefix() + message, 1); return this; }
-    public GuildObject error(Object obj) { error(String.valueOf(obj)); return this; }
+    public final GuildObject error(CharSequence message) { Logger.error(getPrefix() + message, 1); return this; }
+    public final GuildObject error(Object obj) { error(String.valueOf(obj)); return this; }
 
-    public GuildObject log(CharSequence message) { Logger.log(getGuildPrefix() + message, 1); return this; }
-    public GuildObject log(Object obj) { log(String.valueOf(obj)); return this; }
+    public final GuildObject log(CharSequence message) { Logger.log(getPrefix() + message, 1); return this; }
+    public final GuildObject log(Object obj) { log(String.valueOf(obj)); return this; }
 
 
-    public String getGuildPrefix() { return getGuildPrefix(guild); }
+    public String getPrefix() { return getPrefix(guild); }
 
-    public static String getGuildPrefix(Guild guild) { return guild.getId() + ":" + guild.getName() + " -> "; }
+    public static String getPrefix(Guild guild) { return guild.getId() + ":" + guild.getName() + " -> "; }
 
     /*
     *
@@ -151,7 +159,7 @@ public class GuildObject {
     *
     * */
 
-    public boolean setModLogChannel(@NotNull TextChannel channel, @NotNull String modifier) {
+    public final boolean setModLogChannel(@NotNull TextChannel channel, @NotNull String modifier) {
         if (setModLogChannel(channel)) {
             modLog(modifier + " set new mod-log channel: " + channel.getAsMention());
             return true;
@@ -174,19 +182,19 @@ public class GuildObject {
         return result;
     }
 
-    public TextChannel getModLogChannel() {
+    public final TextChannel getModLogChannel() {
         if (modLogChannel == null) { loadModLogChannel(); }
         return modLogChannel;
     }
 
-    public ModLogStatus getModLogStatus() {
+    public final ModLogStatus getModLogStatus() {
         if (modLogStatus == null) { loadModLogChannel(); }
         return modLogStatus;
     }
 
-    public String getGuildId() { return guildId; }
+    public final String getGuildId() { return guildId; }
 
-    public String getGuildName() { return guildName; }
+    public final String getGuildName() { return guildName; }
 
-    public Guild getGuild() { return guild; }
+    public final Guild getGuild() { return guild; }
 }

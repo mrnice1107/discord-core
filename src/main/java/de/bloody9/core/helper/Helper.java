@@ -20,7 +20,7 @@ import java.util.*;
 
 import static de.bloody9.core.logging.Logger.debug;
 import static de.bloody9.core.logging.Logger.error;
-import static de.bloody9.core.models.objects.GuildObject.getGuildPrefix;
+import static de.bloody9.core.models.objects.GuildObject.getPrefix;
 
 
 public class Helper {
@@ -45,7 +45,7 @@ public class Helper {
     public static void sendOwner(@NotNull String message, @NotNull Guild guild) {
         Member owner = guild.getOwner();
         if (owner != null) {
-            debug(getGuildPrefix(guild) + "send message to guild owner: " + owner.getUser().getName());
+            debug(getPrefix(guild) + "send message to guild owner: " + owner.getUser().getName());
             sendPrivateMessage(owner.getUser(), message);
         }
     }
