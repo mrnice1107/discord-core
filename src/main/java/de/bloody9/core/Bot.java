@@ -336,7 +336,7 @@ public class Bot {
         // commands must be lower case
         commands.put("help", new HelpCommand());
         commands.put("permission", new PermissionCommand());
-        commands.put("log", new LogCommand());
+        commands.put("log", new ModLogCommand());
         commands.put("ban", new BanCommand());
         commands.put("kick", new KickCommand());
         commands.put("clear", new ClearCommand());

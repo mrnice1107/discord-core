@@ -262,37 +262,39 @@ public class Helper {
         return builder.toString();
     }
 
-    public static String getInsertSQL(String table, String contentType, String content) {
-        String sql = "INSERT INTO <table> (<contentType>) VALUES(<content>);";
-        sql = sql.replace("<table>", table).replace("<contentType>", contentType).replace("<content>", content);
-
-        return sql;
+    public static String getInsertSQL(@NotNull String table, @NotNull String contentType, @NotNull String content) {
+        final String sql = "INSERT INTO <table> (<contentType>) VALUES(<content>);";
+        return sql.replace("<table>", table).replace("<contentType>", contentType).replace("<content>", content);
     }
-
-    public static String getDeleteSQL(String table, String query) {
-        String sql = "DELETE FROM <table> WHERE <query>;";
-        sql = sql.replace("<table>", table).replace("<query>", query);
-
-        return sql;
+    public static String getDeleteSQL(@NotNull String table, @NotNull String query) {
+        final String sql = "DELETE FROM <table> WHERE <query>;";
+        return sql.replace("<table>", table).replace("<query>", query);
     }
-
+    public static String getUpdateSQL(@NotNull String table, @NotNull String update, @NotNull String query) {
+        final String sql = "UPDATE <table> SET <update> WHERE <query>;";
+        return sql.replace("<table>", table).replace("<update>", update).replace("<query>", query);
+    }
     public static String getInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String queryOnUpdate) {
-        String sql = getInsertSQL(table, contentType, content);
-        return sql.substring(0, sql.length()-1) + " ON DUPLICATE KEY UPDATE " + queryOnUpdate + ";";
+        final String sql = getInsertSQL(table, contentType, content);
+        return sql.substring(0, sql.length() - 1) + " ON DUPLICATE KEY UPDATE " + queryOnUpdate + ";";
     }
 
-
-    public static boolean executeInsertSQL(String table, String contentType, String content) {
+    public static boolean executeInsertSQL(@NotNull String table, @NotNull String contentType, @NotNull String content) {
         return MySQLConnection.executeUpdate(getInsertSQL(table, contentType, content));
     }
+    public static boolean executeDeleteSQL(@NotNull String table, @NotNull String query) {
+        return MySQLConnection.executeUpdate(getDeleteSQL(table, query));
+    }
+    public static boolean executeUpdateSQL(@NotNull String table, @NotNull String update, @NotNull String query) {
+        return MySQLConnection.executeUpdate(getUpdateSQL(table, update, query));
+    }
+    public static boolean executeInsertUpdateOnDuplicateSQL(@NotNull String table, @NotNull String contentType, @NotNull String content, @NotNull String onUpdate) {
+        return MySQLConnection.executeUpdate(getInsertUpdateOnDuplicateSQL(table, contentType, content, onUpdate));
+    }
 
-    public static boolean executeDeleteSQL(String table, String query) { return MySQLConnection.executeUpdate(getDeleteSQL(table, query)); }
-
-    public static boolean executeInsertUpdateOnDuplicateSQL(String table, String contentType, String content, String onUpdate) { return MySQLConnection.executeUpdate(getInsertUpdateOnDuplicateSQL(table, contentType, content, onUpdate)); }
 
 
-
-    public static String getLineFromConsole(String out) {
+    public static String getLineFromConsole(@NotNull String out) {
         System.out.println(out);
         Scanner in = new Scanner(System.in);
         return in.nextLine();

@@ -78,7 +78,7 @@ public class GuildObject {
         builder.clear();
         return this;
     }
-    public final GuildObject modLog(Object obj) { modLog(String.valueOf(obj)); return this; }
+    public final GuildObject modLog(Object obj) { return modLog(String.valueOf(obj)); }
     public final GuildObject modLog(CharSequence message) {
         info(message);
 
@@ -89,6 +89,32 @@ public class GuildObject {
             if (!modLogMerge(message)) modLogChannel.sendMessage(message).queue();
         }
         return this;
+    }
+
+    public final String modLogMessage(CharSequence message) {
+        info(message);
+
+        if (modLogChannel == null) {
+            loadModLogChannel();
+        }
+
+        if (modLogChannel != null) {
+            return modLogChannel.sendMessage(message).complete().getId();
+        }
+        return null;
+    }
+    public final String modLogMessage(Object obj) { return modLogMessage(String.valueOf(obj)); }
+    public final String modLogMessage(CharSequence message, EmbedBuilder builder) {
+        info(message);
+
+        if (modLogChannel == null) {
+            loadModLogChannel();
+        }
+        if (modLogChannel != null) {
+            return modLogChannel.sendMessage(builder.build()).complete().getId();
+        }
+        builder.clear();
+        return null;
     }
 
     private boolean modLogMerge(CharSequence message) {
@@ -112,20 +138,6 @@ public class GuildObject {
             }
         }
         return false;
-    }
-
-    public final String modLogMessage(Object obj) { return modLogMessage(String.valueOf(obj)); }
-    public final String modLogMessage(CharSequence message) {
-        info(message);
-
-        if (modLogChannel == null) {
-            loadModLogChannel();
-        }
-
-        if (modLogChannel != null) {
-            return modLogChannel.sendMessage(message).complete().getId();
-        }
-        return null;
     }
 
     public final GuildObject test(CharSequence message) { Logger.test(getPrefix() + message, 1); return this; }

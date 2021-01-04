@@ -15,6 +15,7 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Command
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\console\CMDLogSave.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\permissions\GuildPermissionUpdater.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\PermissionObject.java
+D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\ModLogCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\PermissionCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\listener\CommandListener.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\CommandManager.java
@@ -24,7 +25,6 @@ D:\Projects\github\discord-core\src\main\java\de\bloody9\core\listener\JoinListe
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\threads\ConsoleCommandReader.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\helper\PermissionHelper.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\logging\LogLevel.java
-D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\LogCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\exceptions\Command\NoNumberCommandException.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\commands\bot\ActivityCommand.java
 D:\Projects\github\discord-core\src\main\java\de\bloody9\core\models\objects\UpdatableGuildObject.java

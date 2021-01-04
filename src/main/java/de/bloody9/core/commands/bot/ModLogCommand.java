@@ -15,7 +15,7 @@ import java.util.List;
 import static de.bloody9.core.helper.PermissionHelper.memberHasPermission;
 import static de.bloody9.core.logging.Logger.debug;
 
-public class LogCommand implements BotCommand {
+public class ModLogCommand implements BotCommand {
 
     private final String generalPermission = "commands.log";
     private final String managePermission = "commands.log.manage";
@@ -27,13 +27,14 @@ public class LogCommand implements BotCommand {
     private final String help;
 
 
-    public LogCommand() {
+    public ModLogCommand() {
         permissionObjects = new ArrayList<>();
         permissionObjects.add(new PermissionObject(generalPermission, "Execute command"));
         permissionObjects.add(new PermissionObject(managePermission, "Change the mod-log chanel"));
 
         aliases = new ArrayList<>();
         aliases.add("logging");
+        aliases.add("modlog");
 
         description = "With this command you can set the log channel for the Bots log entries!";
 
